@@ -1,0 +1,144 @@
+/* General Container Styles */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.content-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  padding: 20px;
+}
+
+/* Bottom Navigation Styles */
+.bottom-nav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: linear-gradient(90deg, #141e30, #243b55);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.5);
+  padding: 15px 0;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 1000; /* Ensure it stays above other content */
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+/* Navigation Item Styles */
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: #ffffff;
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.2s ease;
+  position: relative;
+}
+
+.nav-item .icon {
+  font-size: 1.6rem;
+  margin-bottom: 5px;
+  color: #ffffff;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.nav-item .label {
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.8rem;
+  transition: opacity 0.3s ease;
+  opacity: 0.8;
+}
+
+.nav-item.active {
+  color: #00bcd4;
+  transform: scale(1.1);
+}
+
+.nav-item.active .icon {
+  color: #00bcd4;
+  filter: drop-shadow(0 0 10px #00bcd4);
+}
+
+.nav-item:hover {
+  color: #00bcd4;
+  transform: scale(1.05);
+}
+
+.nav-item:hover .icon {
+  color: #00bcd4;
+  filter: drop-shadow(0 0 12px #00bcd4);
+}
+
+.nav-item:hover .label {
+  opacity: 1;
+}
+
+/* Glowing Effects */
+.nav-item:hover::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40%;
+  height: 2px;
+  background: linear-gradient(90deg, #00bcd4, #1e90ff, #00bcd4);
+  animation: glow 1.5s infinite;
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 10px #00bcd4, 0 0 20px #1e90ff, 0 0 30px #00bcd4;
+  }
+  50% {
+    box-shadow: 0 0 15px #00bcd4, 0 0 25px #1e90ff, 0 0 35px #00bcd4;
+  }
+}
+
+/* Dark Mode Support */
+body.dark-mode .bottom-nav {
+  background: linear-gradient(90deg, #0f2027, #203a43, #2c5364);
+  box-shadow: 0 -2px 12px rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .nav-item {
+  color: #cccccc;
+}
+
+body.dark-mode .nav-item.active {
+  color: #4caf50;
+}
+
+body.dark-mode .nav-item:hover {
+  color: #4caf50;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .nav-item {
+    font-size: 0.8rem;
+  }
+  .nav-item .icon {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-item {
+    font-size: 0.7rem;
+  }
+  .nav-item .icon {
+    font-size: 1.2rem;
+  }
+}

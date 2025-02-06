@@ -1,0 +1,84 @@
+/* Gradient background */
+.gradient-background {
+    background: linear-gradient(135deg, #0F2027, #203A43, #2C5364);
+    overflow: hidden;
+    position: relative;
+  }
+  
+  /* Floating orbs */
+  .floating-orbs::before,
+  .floating-orbs::after {
+    content: '';
+    position: absolute;
+    top: -200px;
+    right: -200px;
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: floatOrb 10s infinite ease-in-out;
+    mix-blend-mode: overlay;
+  }
+  
+  .floating-orbs::after {
+    top: auto;
+    bottom: -200px;
+    left: -200px;
+    animation: floatOrb 8s infinite ease-in-out;
+  }
+  
+  /* Orb floating animation */
+  @keyframes floatOrb {
+    0%, 100% {
+      transform: translate(0, 0);
+    }
+    50% {
+      transform: translate(50px, 50px);
+    }
+  }
+  
+  /* Section title animation */
+  .section-title {
+    font-size: 1.5rem;
+    color: #fff;
+    text-align: center;
+    padding-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .section-title::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: #00FFFF;
+    transition: width 0.5s;
+  }
+  
+  .section-title:hover::after {
+    width: 100%;
+  }
+  
+  /* Group buttons */
+  .group-button {
+    background: rgba(0, 255, 255, 0.2);
+    color: #54d5d9;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .group-button:hover {
+    background: #00FFFF;
+    color: #000;
+    transform: scale(1.05);
+  }
+  
