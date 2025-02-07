@@ -22,88 +22,62 @@ const LoadingContainer = styled.div`
   font-size: 1.5em;
 `;
 
-const WorldMap = ({ group_id, backgroundColor }) => {
+const WorldMap = ({ group_id }) => {
   const [countryData, setCountryData] = useState({});
   const [isDataReady, setIsDataReady] = useState(false);
   const [colorScale, setColorScale] = useState({ min: 0, max: 100 });
 
-  // Hardcoded data for country values
-  const hardcodedData = {
-    US: 90,
-    CN: 50,
-    IN: 70,
-    FR: 30,
-    DE: 60,
-    BR: 40,
-    RU: 80,
-    ZA: 20,
-  };
-
-  // Fetch data from the backend (commented out for now)
-
-  const fetchData = async () => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_SERVER_URL}/homeworldmap?group_id=${group_id}`,
-        {
-          method: "GET",
-          // headers: {
-          //   "ngrok-skip-browser-warning": "true"
-          // }
-        }
-      );
-
-      // Parse the JSON response
-      const result = await response.json();
-      setCountryData(result); // Use the fetched data
-      console.log("Data successfully fetched from the backend:", result);
-    } catch (error) {
-      console.error("Error fetching data:", error.message);
-    }
-  };
-
-
   useEffect(() => {
-    // Simulate data processing
-    const processHardcodedData = () => {
-      let minValue = Infinity;
-      let maxValue = -Infinity;
+    const fetchData = async () => {
+      try {
+        console.log("Fetching data for group_id:", group_id); // Debugging log
+        if (!group_id) {
+          throw new Error("group_id is missing.");
+        }
 
-      Object.values(hardcodedData).forEach((value) => {
-        if (value < minValue) minValue = value;
-        if (value > maxValue) maxValue = value;
-      });
+        const response = await fetch(
+          `${process.env.REACT_APP_SERVER_URL}/homeworldmap?group_id=${group_id}`
+        );
+        const result = await response.json();
 
-      setCountryData(hardcodedData); // Replace with fetched data if uncommenting fetch logic
-      setColorScale({ min: minValue, max: maxValue });
-      setIsDataReady(true);
+        if (!result || Object.keys(result).length === 0) {
+          throw new Error("Invalid or empty data received.");
+        }
+
+        // Filter out invalid values
+        const validData = Object.fromEntries(
+          Object.entries(result).filter(([_, value]) => value !== null && value !== undefined)
+        );
+
+        if (Object.keys(validData).length === 0) {
+          throw new Error("No valid data found.");
+        }
+
+        setCountryData(validData);
+        setColorScale({
+          min: Math.min(...Object.values(validData)),
+          max: Math.max(...Object.values(validData)),
+        });
+        setIsDataReady(true);
+        console.log("Data successfully fetched:", validData);
+      } catch (error) {
+        console.error("Error fetching data:", error.message);
+      }
     };
 
-    processHardcodedData();
-
-    // Uncomment below to use fetch logic
-    //fetchData();
-
+    fetchData();
   }, [group_id]);
 
-  // Generate color based on data value
+  // Function to generate color based on data value
   const getCountryColor = (value) => {
-    if (value === undefined || value === null) {
-      return "#1a1a1a"; // Default color for missing data
-    }
+    if (value === undefined || value === null) return "#1a1a1a"; // Default color for missing data
 
-    const scale = colorScale;
-    const normalizedValue = (value - scale.min) / (scale.max - scale.min);
-
+    const normalizedValue = (value - colorScale.min) / (colorScale.max - colorScale.min);
     const glowColors = ["#98e6e8", "#43aaae", "#328082"]; // Light, medium, and dark blues
 
-    if (normalizedValue < 0.33) {
-      return glowColors[0]; // Light blue for low values
-    } else if (normalizedValue < 0.67) {
-      return glowColors[1]; // Medium blue for medium values
-    } else {
-      return glowColors[2]; // Dark blue for high values
-    }
+    if (normalizedValue < 0.33) return glowColors[0]; // Light blue for low values
+    if (normalizedValue < 0.67) return glowColors[1]; // Medium blue for mid values
+    return glowColors[2]; // Dark blue for high values
   };
 
   // Render loading state
@@ -117,10 +91,7 @@ const WorldMap = ({ group_id, backgroundColor }) => {
         map={worldMill}
         backgroundColor="transparent"
         zoomOnScroll={false}
-        containerStyle={{
-          width: "100%",
-          height: "100%", // Fill the container
-        }}
+        containerStyle={{ width: "100%", height: "100%" }}
         regionStyle={{
           initial: {
             fill: "#666666", // Default color for regions
@@ -128,19 +99,19 @@ const WorldMap = ({ group_id, backgroundColor }) => {
             stroke: "none",
             "stroke-width": 0,
             "stroke-opacity": 1,
-            filter: "drop-shadow(0 0 12px #58a7e8)", // Glow effect for all regions
+            filter: "drop-shadow(0 0 12px #58a7e8)", // Glow effect
           },
           hover: {
             "fill-opacity": 0.8,
             cursor: "pointer",
-            filter: "drop-shadow(0 0 18px rgba(0, 255, 255, 1))", // Optional: stronger glow on hover
+            filter: "drop-shadow(0 0 18px rgba(0, 255, 255, 1))", // Stronger glow on hover
           },
         }}
         series={{
           regions: [
             {
-              values: countryData, // Country data from hardcoded object
-              scale: [getCountryColor(colorScale.min), getCountryColor(colorScale.max)],
+              values: countryData, // Country data from API
+              scale: ["#98e6e8", "#328082"], // Scale from light to dark blue
               normalizeFunction: "polynomial",
             },
           ],
