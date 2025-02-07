@@ -44,50 +44,60 @@ const AnalyticsPage = () => {
         `${process.env.REACT_APP_SERVER_URL}/getgroups?user_id=${userTelegramId}`,
         {
           method: "GET",
-
-          //credentials: "include", // Include credentials (cookies, etc.)
           headers: {
             "ngrok-skip-browser-warning": "true",
           },
-
-          // headers: {
-          //   "ngrok-skip-browser-warning": "true"
-          // }
-
         }
       );
-
-      // Parse the JSON response
+  
       const result = await response.json();
-      const groups = result.groups;
-      setGroups(groups); // Update state with fetched data
-      console.log("Data successfully fetched from the backend:");
-      console.log(result); // Log the result for debugging
+      console.log("Fetched groups:", result.groups); // Debugging log
+  
+      if (result.groups && result.groups.length > 0) {
+        setGroups(result.groups); // Ensure groups are set correctly
+      } else {
+        setGroups([]); // Clear state if no groups
+      }
     } catch (error) {
-      console.error("Error fetching data:", error.message);
+      console.error("Error fetching groups:", error.message);
     }
   };
 
   useEffect(() => {
-    // Fetch user data from Telegram WebApp API (replace demo data with actual logic)
+    if (groups && groups.length > 0) {
+      setSelectedGroup(groups[0].group_id);
+      console.log("Default selected group:", groups[0].group_id); // Debugging log
+    }
+  }, [groups]);
+  
+  
+
+  
+  
+
+  useEffect(() => {
     if (window.Telegram && window.Telegram.WebApp) {
       const webApp = window.Telegram.WebApp;
       const telegramUser = webApp.initDataUnsafe?.user;
-
+  
       if (telegramUser) {
         const userTelegramId = telegramUser.id;
+        setUserTelegramId(userTelegramId);
         fetchGroups(userTelegramId);
       }
     } else {
       console.warn("Telegram WebApp is not available. Using demo data.");
+      setGroups(demoGroups); // Set demo data
     }
   }, []);
+  
 
-  useEffect(() => {
-  if (groups && groups.length > 0) {
-    setSelectedGroup(groups[0].id); // Ensure first group is active by default
-  }
-}, [groups]);
+  
+  
+
+
+  
+
 
   const handleClick = (index) => {
     setClickedIndex(index);
