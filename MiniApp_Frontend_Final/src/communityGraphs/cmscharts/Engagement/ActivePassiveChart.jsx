@@ -4,42 +4,33 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const ActivePassiveMembersChart = ({ groupId  }) => {
-  const [theme, setTheme] = useState("light");
-  const [selectedIndex, setSelectedIndex] = useState(null);
+const ActivePassiveMembersChart = ({ groupId }) => {
+  const [theme, setTheme] = useState("light"); // State for theme preference
+  const [selectedIndex, setSelectedIndex] = useState(null); // State for selected section in chart
   const [data, setData] = useState({
-    labels: [],
-    values: [], // Default hardcoded data
+    labels: ["Active Members", "Passive Members"],
+    values: [0, 0], // Default values set to 0 to handle null cases
   });
 
-  // Fetch data from BigQuery or API
-
+  // Function to fetch data from API
   const fetchData = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_URL}/graphs/engagement/activevspassivemembers?group_id=${groupId}`,
-        {
-          method: "GET",
-          // headers: {
-          //   "ngrok-skip-browser-warning": "true"
-          // }
-        }
+        `${process.env.REACT_APP_SERVER_URL}/graphs/engagement/activevspassivemembers?group_id=${groupId}`
       );
 
-      // Check if the response is OK (status 200-299)
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Parse the JSON response
       const result = await response.json();
-
-      // Set the data state with the active and inactive members
+      
+      // Handle cases where data is missing or null
       setData({
         labels: ["Active Members", "Passive Members"],
-        values: [result.activePercentage, result.passivePercentage],
+        values: [result.activePercentage || 0, result.passivePercentage || 0],
       });
-
+      
       console.log("Data successfully fetched from the backend:", result);
     } catch (error) {
       console.error("Error fetching data:", error.message);
@@ -50,10 +41,10 @@ const ActivePassiveMembersChart = ({ groupId  }) => {
     fetchData();
   }, [groupId]);
 
-
-  // Total participation (used for percentage calculation)
+  // Calculate total participation
   const totalValue = data.values.reduce((acc, value) => acc + value, 0);
 
+  // Handle theme changes dynamically
   useEffect(() => {
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setTheme(matchMedia.matches ? "dark" : "light");
@@ -68,8 +59,9 @@ const ActivePassiveMembersChart = ({ groupId  }) => {
     };
   }, []);
 
-  const themeColors = ["#225557", "#54D5D9"]; // Active (teal) and Passive (red)
+  const themeColors = ["#225557", "#54D5D9"]; // Colors for active and passive members
 
+  // Function to lighten colors for hover effect
   const lightenColor = (color, amount) => {
     const num = parseInt(color.slice(1), 16);
     const r = Math.min(255, (num >> 16) + amount);
@@ -80,6 +72,7 @@ const ActivePassiveMembersChart = ({ groupId  }) => {
 
   const hoverColors = themeColors.map((color) => lightenColor(color, 30));
 
+  // Chart data configuration
   const chartData = {
     labels: data.labels,
     datasets: [
@@ -98,13 +91,14 @@ const ActivePassiveMembersChart = ({ groupId  }) => {
     ],
   };
 
+  // Chart options
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    cutout: "70%", // Hollow center for doughnut effect
+    cutout: "70%", // Creates hollow center for doughnut chart
     plugins: {
       legend: {
-        display: false, // Hide legend for a cleaner look
+        display: false, // Hide legend for a cleaner UI
       },
       tooltip: {
         backgroundColor: theme === "dark" ? "#333" : "#FFF",
@@ -114,7 +108,7 @@ const ActivePassiveMembersChart = ({ groupId  }) => {
         borderWidth: 1,
         callbacks: {
           label: function (context) {
-            const value = data.values[context.dataIndex];
+            const value = data.values[context.dataIndex] || 0;
             return `${context.label}: ${value}%`;
           },
         },
@@ -136,7 +130,6 @@ const ActivePassiveMembersChart = ({ groupId  }) => {
 
   return (
     <div style={chartContainerStyle}>
-      {/* {title && <h2 style={titleStyle}>{title}</h2> } Conditionally display title */}
       <div style={{ position: "relative", width: "100%", height: "80%" }}>
         <Doughnut data={chartData} options={options} />
         <div style={detailsStyle}>
@@ -146,14 +139,14 @@ const ActivePassiveMembersChart = ({ groupId  }) => {
                 {data.labels[selectedIndex]}
               </div>
               <div style={{ ...valueStyle, fontSize: "18px", fontWeight: "500" }}>
-                {`${data.values[selectedIndex]}%`}
+                {`${data.values[selectedIndex] || 0}%`}
               </div>
             </>
           ) : (
             <>
               <div style={{ ...titleStyle, fontSize: "14px", fontWeight: "600" }}>Total</div>
               <div style={{ ...valueStyle, fontSize: "18px", fontWeight: "500" }}>
-                {`${totalValue}%`}
+                {`${totalValue || 0}%`}
               </div>
             </>
           )}

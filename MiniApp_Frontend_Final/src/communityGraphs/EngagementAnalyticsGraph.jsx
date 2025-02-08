@@ -359,10 +359,7 @@ const EngagementAnalyticsGraph = ({ groupId }) => {
               >
                 <PostEngagementChart
                   groupId={groupId}
-                  postNames={["Post 1", "Post 2", "Post 3", "Post 4", "Post 5"]}
-                  replies={[120, 150, 200, 100, 80]}
-                  shares={[50, 70, 90, 60, 30]}
-                  reactions={[300, 400, 500, 350, 250]}
+                 
                 />
               </Box>
             </CardContent>

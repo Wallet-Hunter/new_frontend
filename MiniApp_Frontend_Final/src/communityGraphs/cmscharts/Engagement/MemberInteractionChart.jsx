@@ -15,45 +15,58 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend, Title)
 const MemberInteractionsChart = ({ groupId }) => {
   const backgroundColorLight = "rgba(75, 192, 192, 1)";
   const backgroundColorDark = "rgba(67, 229, 244, 1)";
-  
+
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [chartLabels, setChartLabels] = useState([]);
   const [chartData, setChartData] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setIsDarkMode(matchMedia.matches);
+
     const handleChange = (e) => setIsDarkMode(e.matches);
     matchMedia.addEventListener("change", handleChange);
 
     const fetchData = async () => {
+      if (!groupId) {
+        setError("Group ID is missing");
+        return;
+      }
+    
       try {
         const response = await fetch(
           `${process.env.REACT_APP_SERVER_URL}/graphs/engagement/membersinteractions?group_id=${groupId}`
         );
-
+    
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-
+    
         const result = await response.json();
-
-        // Convert API response to expected format
-        if (Array.isArray(result)) {
-          const labels = result.map((entry) => entry.date);
-          const data = result.map((entry) => entry.averageInteractions);
-
-          setChartLabels(labels);
-          setChartData(data);
+        console.log("API Response:", result); // Debugging log
+    
+        if (Array.isArray(result) && result.length > 0) {
+          const formattedData = result.map((entry) => ({
+            date: entry.date,
+            avgReplies: entry.avgReplies ?? 0,
+            avgMentions: entry.avgMentions ?? 0,
+            avgForwards: entry.avgForwards ?? 0,
+            averageInteractions: entry.averageInteractions ?? 0,
+          }));
+    
+          setChartLabels(formattedData.map((item) => item.date));
+          setChartData(formattedData.map((item) => item.averageInteractions));
         } else {
-          console.error("Unexpected API response format:", result);
+          setChartLabels([]);
+          setChartData([]);
         }
-
-        console.log("Fetched data:", result);
       } catch (error) {
         console.error("Error fetching data:", error.message);
+        setError(0);
       }
     };
+    
 
     fetchData();
 
@@ -76,7 +89,9 @@ const MemberInteractionsChart = ({ groupId }) => {
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
-      {chartLabels.length > 0 ? (
+      {error ? (
+        <p style={{ textAlign: "center", color: isDarkMode ? "white" : "black" }}>{error}</p>
+      ) : chartLabels.length > 0 ? (
         <div style={{ width: "100%", height: "90%" }} className="chart-container">
           <Bar
             data={data}
@@ -122,8 +137,8 @@ const MemberInteractionsChart = ({ groupId }) => {
                 bar: {
                   borderRadius: 10,
                   hoverBackgroundColor: isDarkMode
-                    ? `${backgroundColorDark}0.7`
-                    : `${backgroundColorLight}0.7`,
+                    ? "rgba(67, 229, 244, 0.7)"
+                    : "rgba(75, 192, 192, 0.7)",
                 },
               },
             }}

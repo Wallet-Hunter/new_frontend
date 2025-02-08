@@ -24,7 +24,11 @@ import MostActiveUsersChart from "./cmscharts/Message/MostActiveUsersChart";
 import MessageTypeChart from "./cmscharts/Message/MessageTypeChart";
 import TotalMessagesCard from "./cmscharts/Message/TotalMessagesCard";
 
-const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
+const MessageAnalyticsGraph = ({
+  lineChartCsvFile,
+  heatMapCsvFile,
+  groupId,
+}) => {
   const [lineChartData, setLineChartData] = useState([]);
   const [heatMapData, setHeatMapData] = useState([]);
   //const isSmallScreen = useMediaQuery("(max-width: 900px)"); // Check if the screen size is small
@@ -51,13 +55,10 @@ const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
         flexDirection: { xs: "column", lg: "row" }, // Responsive layout
         gap: 1,
         height: "100%",
-
       }}
     >
       {/* Right side for leaderboard */}
-      <Box
-        sx={{ width: { xs: "100%", lg: "40%" } }}
-      >
+      <Box sx={{ width: { xs: "100%", lg: "40%" } }}>
         <Card
           sx={{
             height: "50%",
@@ -80,7 +81,6 @@ const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
           gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, // 1 column on small screens, 2 on larger
           gridTemplateRows: "repeat(3, auto)",
           gap: 1,
-
         }}
       >
         {/* Graphs in a 3x2 grid */}
@@ -120,9 +120,7 @@ const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
                 width: "90%",
               }}
             >
-              <TotalMessagesCard
-
-              />
+              <TotalMessagesCard groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -162,9 +160,7 @@ const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
                 width: "90%",
               }}
             >
-              <MessageFrequencyChart
-
-              />
+              <MessageFrequencyChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -204,10 +200,7 @@ const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
                 width: "90%",
               }}
             >
-              <MostActiveUsersChart
-                labels={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]}
-                data={[30, 40, 50, 60, 80, 29, 40, 50, 70, 90]}
-              />
+              <MostActiveUsersChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -247,7 +240,7 @@ const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
                 width: "90%",
               }}
             >
-              <MessageTimingChart data={heatMapData} />
+              <MessageTimingChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -287,7 +280,7 @@ const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
                 width: "90%",
               }}
             >
-              <MessageTypeChart />
+              <MessageTypeChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -327,7 +320,7 @@ const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
                 width: "90%",
               }}
             >
-              <MessageThreadsChart />
+              <MessageThreadsChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -367,7 +360,7 @@ const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
                 width: "90%",
               }}
             >
-              <MessageRepliesChart />
+              <MessageRepliesChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -407,7 +400,7 @@ const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
                 width: "90%",
               }}
             >
-              <MessageSentimentChart />
+              <MessageSentimentChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -431,7 +424,7 @@ const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
               padding: "8px",
               width: "100%",
               height: "100%",
-              color: "white"
+              color: "white",
             }}
           >
             <Typography variant="h6" gutterBottom>
@@ -447,7 +440,7 @@ const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
                 width: "90%",
               }}
             >
-              <MessageReachChart />
+              <MessageReachChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -471,7 +464,7 @@ const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
               padding: "8px",
               width: "100%",
               height: "100%",
-              color: "white"
+              color: "white",
             }}
           >
             <Typography variant="h6" gutterBottom>
@@ -487,7 +480,7 @@ const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
                 width: "90%",
               }}
             >
-              <MessageQualityChart />
+              <MessageQualityChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -511,7 +504,7 @@ const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
               padding: "8px",
               width: "100%",
               height: "100%",
-              color: "white"
+              color: "white",
             }}
           >
             <Typography variant="h6" gutterBottom>
@@ -527,7 +520,7 @@ const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
                 width: "90%",
               }}
             >
-              <SpamDetectionChart />
+              <SpamDetectionChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -551,14 +544,13 @@ const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
               padding: "8px",
               width: "100%",
               height: "100%",
-              color: "white"
+              color: "white",
             }}
           >
             <Typography variant="h6" gutterBottom>
               Message Engagement Rate
             </Typography>
             <Box
-
               sx={{
                 flexGrow: 1,
                 display: "flex",
@@ -568,7 +560,7 @@ const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
                 width: "90%",
               }}
             >
-              <MessageEngagementRateChart />
+              <MessageEngagementRateChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -592,7 +584,7 @@ const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
               padding: "8px",
               width: "100%",
               height: "100%",
-              color: "white"
+              color: "white",
             }}
           >
             <Typography variant="h6" gutterBottom>
@@ -608,10 +600,7 @@ const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
                 width: "90%",
               }}
             >
-              <MessagePerformanceChart
-                labels={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]}
-                data={[30, 40, 50, 60, 80, 29, 40, 50, 70, 90]}
-              />
+              <MessagePerformanceChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -657,7 +646,6 @@ const MessageAnalyticsGraph = ({ lineChartCsvFile, heatMapCsvFile }) => {
           </Card> */}
       </Box>
     </Box>
-
   );
 };
 

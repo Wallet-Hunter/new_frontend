@@ -9,50 +9,52 @@ import {
   Legend,
 } from "chart.js";
 
+// Register necessary Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 const PostEngagementChart = ({ groupId }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [data, setData] = useState({}); // State to store fetched data
 
-   // Color variables moved below the arguments
-   const backgroundColorLight = "#54d5d9"; // Light mode bar color for replies
-   const backgroundColorDark = "#43aaae"; // Dark mode bar color for replies
-   const backgroundColorLightShares = "#225557"; // Light mode color for shares
-   const backgroundColorDarkShares = "#54d5d9"; // Dark mode color for shares
-   const backgroundColorLightReactions = "#43aaae"; // Light mode color for reactions
-   const backgroundColorDarkReactions = "#225557"; // Dark mode color for reactions
+  // Define color schemes for dark and light modes
+  const backgroundColorLight = "#54d5d9";
+  const backgroundColorDark = "#43aaae";
+  const backgroundColorLightShares = "#225557";
+  const backgroundColorDarkShares = "#54d5d9";
+  const backgroundColorLightReactions = "#43aaae";
+  const backgroundColorDarkReactions = "#225557";
 
-  // Fetch data from Backend
+  // Fetch engagement data from the backend
   const fetchData = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/graphs/engagement/postengagement?group_id=${groupId}`, {
-        method: "GET",
-        // headers: {
-        //   "ngrok-skip-browser-warning": "true"
-        // }
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/graphs/engagement/postengagement?group_id=${groupId}`
+      );
+      
+      const result = await response.json();
+      
+      // Ensure that null or undefined values are replaced with 0
+      setData({
+        postNames: result.postNames || [],
+        replies: result.replies?.map(val => val ?? 0) || [],
+        shares: result.shares?.map(val => val ?? 0) || [],
+        reactions: result.reactions?.map(val => val ?? 0) || [],
       });
 
-      // Parse the JSON response
-      const result = await response.json();
-      setData(result); // Set the fetched data
-      console.log("Data successfully fetched from the backend:");
-      console.log(result); // Log the result for debugging
+      console.log("Data successfully fetched:", result);
     } catch (error) {
       console.error("Error fetching data:", error.message);
     }
   };
 
-  // Use effect to detect dark mode preference and fetch data
+  // Detect dark mode preference and fetch data when the component mounts
   useEffect(() => {
-    // Detect dark mode preference
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setIsDarkMode(matchMedia.matches);
 
     const handleChange = (e) => setIsDarkMode(e.matches);
     matchMedia.addEventListener("change", handleChange);
 
-    // Fetch data when the component mounts
     fetchData();
 
     return () => {
@@ -60,27 +62,27 @@ const PostEngagementChart = ({ groupId }) => {
     };
   }, []);
 
-  // Prepare chart data based on fetched data
+  // Prepare chart data for rendering
   const chartData = {
-    labels: data.postNames || [], // Posts on the X-axis
+    labels: data.postNames,
     datasets: [
       {
         label: "Replies",
-        data: data.replies || [], // Replies data
+        data: data.replies,
         backgroundColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
         borderColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
         borderWidth: 1,
       },
       {
         label: "Shares",
-        data: data.shares || [], // Shares data
+        data: data.shares,
         backgroundColor: isDarkMode ? backgroundColorDarkShares : backgroundColorLightShares,
         borderColor: isDarkMode ? backgroundColorDarkShares : backgroundColorLightShares,
         borderWidth: 1,
       },
       {
         label: "Reactions",
-        data: data.reactions || [], // Reactions data
+        data: data.reactions,
         backgroundColor: isDarkMode ? backgroundColorDarkReactions : backgroundColorLightReactions,
         borderColor: isDarkMode ? backgroundColorDarkReactions : backgroundColorLightReactions,
         borderWidth: 1,
@@ -107,7 +109,7 @@ const PostEngagementChart = ({ groupId }) => {
               tooltip: {
                 callbacks: {
                   label: (tooltipItem) => {
-                    return `${tooltipItem.dataset.label}: ${tooltipItem.raw}`; // Tooltip shows metric and count
+                    return `${tooltipItem.dataset.label}: ${tooltipItem.raw}`;
                   },
                 },
               },
@@ -116,22 +118,20 @@ const PostEngagementChart = ({ groupId }) => {
               x: {
                 title: {
                   display: true,
-                  text: "Posts", // X-axis title
+                  text: "Posts",
                   color: "white",
                 },
                 ticks: {
                   color: "white",
                 },
                 grid: {
-                  color: isDarkMode
-                    ? "rgba(220, 220, 220, 0.1)"
-                    : "rgba(0, 0, 0, 0.1)",
+                  color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
                 },
               },
               y: {
                 title: {
                   display: true,
-                  text: "Engagement Metrics", // Y-axis title
+                  text: "Engagement Metrics",
                   color: "white",
                 },
                 ticks: {
@@ -139,9 +139,7 @@ const PostEngagementChart = ({ groupId }) => {
                 },
                 beginAtZero: true,
                 grid: {
-                  color: isDarkMode
-                    ? "rgba(220, 220, 220, 0.1)"
-                    : "rgba(0, 0, 0, 0.1)",
+                  color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
                 },
               },
             },
@@ -158,7 +156,7 @@ const PostEngagementChart = ({ groupId }) => {
       </div>
       <style jsx>{`
         .chart-container:hover .chartjs-render-monitor {
-          transform: scale(1.05); /* Scale the chart on hover */
+          transform: scale(1.05);
           transition: transform 0.3s ease;
         }
       `}</style>

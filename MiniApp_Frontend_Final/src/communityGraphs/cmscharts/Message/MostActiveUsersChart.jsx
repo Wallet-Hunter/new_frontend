@@ -12,6 +12,7 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 const MostActiveUsersChart = ({
+  groupId,
   members = [], // Member names or IDs (Y-axis)
   messageCounts = [], // Number of messages sent by each member (X-axis)
   backgroundColorLight = "rgba(75, 192, 192, 1)",
@@ -26,7 +27,7 @@ const MostActiveUsersChart = ({
   // Fetch data from BigQuery (commented out for now)
   const fetchData = async () => {
     try {
-      const response = await fetch('${process.env.REACT_APP_SERVER_URL}/graphs/messages/mostactiveusers?group_id=${group_id}', {
+      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/graphs/messages/mostactiveusers?group_id=${groupId}`, {
         method: "GET",
         //credentials: "include", // Include credentials (cookies, etc.)
       });
@@ -74,7 +75,7 @@ const MostActiveUsersChart = ({
     return () => {
       matchMedia.removeEventListener("change", handleChange);
     };
-  }, []);
+  }, [groupId]);
 
   // Chart data configuration
   const chartData = {

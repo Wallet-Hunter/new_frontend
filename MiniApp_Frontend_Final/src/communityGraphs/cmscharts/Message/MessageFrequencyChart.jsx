@@ -12,13 +12,13 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 const MessageFrequencyChart = ({
-  labels = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], // Days of the week
+  groupId,
   backgroundColorLight = "rgba(75, 192, 192, 1)",
   backgroundColorDark = "rgba(67, 229, 244, 1)",
 }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [chartData, setChartData] = useState({
-    labels,
+    labels: [],
     datasets: [
       {
         data: [],
@@ -33,26 +33,25 @@ const MessageFrequencyChart = ({
   const fetchData = async () => {
     try {
       const response = await fetch(
-        '${process.env.REACT_APP_SERVER_URL}/graphs/messages/messagefrequency?group_id=${group_id}',
-        {
-          method: "GET",
-          //credentials: "include", // Include credentials (cookies, etc.)
-        }
+        `${process.env.REACT_APP_SERVER_URL}/graphs/message/messagefrequency?group_id=${groupId}`,
+        { method: "GET" }
       );
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
-      // Parse the JSON response
       const result = await response.json();
-      const messageFrequency = result.map((item) => item.message_count); // Adjust based on API response
+
+      // Extract labels (dates) and values (message counts)
+      const labels = result.map((item) => item.message_date.value);
+      const values = result.map((item) => item.daily_message_count);
 
       setChartData({
         labels,
         datasets: [
           {
-            data: messageFrequency,
+            data: values,
             backgroundColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
             borderColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
             borderWidth: 1,
@@ -60,7 +59,7 @@ const MessageFrequencyChart = ({
         ],
       });
 
-      console.log("Data successfully fetched from the backend:", result);
+      console.log("Processed Data:", { labels, values });
     } catch (error) {
       console.error("Error fetching data:", error.message);
     }
@@ -68,7 +67,7 @@ const MessageFrequencyChart = ({
 
   useEffect(() => {
     fetchData();
-  }, [isDarkMode, labels]);
+  }, [isDarkMode, groupId]);
 
   useEffect(() => {
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
@@ -82,7 +81,7 @@ const MessageFrequencyChart = ({
   }, []);
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <div style={{ width: "100%", height: "90%" }} className="chart-container">
         <Bar
           data={chartData}
@@ -95,18 +94,16 @@ const MessageFrequencyChart = ({
             },
             hover: {
               animationDuration: 500,
-              mode: 'nearest',
+              mode: "nearest",
               intersect: true,
             },
             plugins: {
               legend: {
-                display: false, // Legend removed
+                display: false, // Hide legend
               },
               tooltip: {
                 callbacks: {
-                  label: (tooltipItem) => {
-                    return `Message Frequency: ${tooltipItem.raw}`; // Tooltip updated to show message frequency
-                  },
+                  label: (tooltipItem) => `Messages: ${tooltipItem.raw}`, // Show count in tooltip
                 },
               },
             },
@@ -114,7 +111,7 @@ const MessageFrequencyChart = ({
               x: {
                 title: {
                   display: true,
-                  text: "Days of the Week", // X-axis label updated to Days of the Week
+                  text: "Dates",
                   color: "white",
                 },
                 ticks: {
@@ -127,7 +124,7 @@ const MessageFrequencyChart = ({
               y: {
                 title: {
                   display: true,
-                  text: "Message Frequency", // Y-axis label updated to Message Frequency
+                  text: "Message Frequency",
                   color: "white",
                 },
                 ticks: {
@@ -135,7 +132,7 @@ const MessageFrequencyChart = ({
                 },
                 beginAtZero: true,
                 grid: {
-                  color: isDarkMode ? 'rgba(220, 220, 220, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                  color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
                 },
               },
             },
@@ -143,7 +140,9 @@ const MessageFrequencyChart = ({
               bar: {
                 borderRadius: 10,
                 backgroundColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
-                hoverBackgroundColor: isDarkMode ? `${backgroundColorDark}0.7` : `${backgroundColorLight}0.7`,
+                hoverBackgroundColor: isDarkMode
+                  ? `${backgroundColorDark}0.7`
+                  : `${backgroundColorLight}0.7`,
               },
             },
           }}

@@ -11,43 +11,52 @@ import {
 import styled from "styled-components";
 
 const LineChart = ({ groupId }) => {
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState("light"); // Tracks theme (light/dark)
+  const [data, setData] = useState([]); // Stores fetched data
+  const [error, setError] = useState(null); // Stores error messages
 
-  // State for dynamic data (from backend)
-  const [data, setData] = useState([]);
-
-  // Fetch data from Backend
+  /**
+   * Fetch engagement trend data from the backend
+   */
   const fetchData = async () => {
+    
+
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_URL}/graphs/engagement/engagementtrends?group_id=${groupId}`,
-        {
-          method: "GET",
-        }
+        `${process.env.REACT_APP_SERVER_URL}/graphs/engagement/engagementtrends?group_id=${groupId}`
       );
-  
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
       const result = await response.json();
-  
-      // Map the response to match the expected format
+
+      if (!result.labels || !result.dailyEngagementCounts) {
+        throw new Error("Invalid data format received from the server.");
+      }
+
+      // Ensure null or undefined values are replaced with 0
       const mappedData = result.labels.map((label, index) => ({
         time: label,
-        engagement: result.dailyEngagementCounts[index],
+        engagement: result.dailyEngagementCounts[index] ?? 0,
       }));
-  
+
       setData(mappedData);
-      console.log("Data successfully fetched and mapped:");
-      console.log(mappedData); // Log the mapped result for debugging
+      console.log("Data successfully fetched and mapped:", mappedData);
     } catch (error) {
       console.error("Error fetching data:", error.message);
+      setError("Error loading data. Please try again.");
     }
   };
-  
 
-  // Fetch the data when the component mounts
+  /**
+   * Runs on component mount to fetch data and listen for theme changes
+   */
   useEffect(() => {
-    fetchData(); // Uncommented to fetch actual data from the backend
+    fetchData(); // Fetch engagement trend data
 
-    // Set theme based on system preference
+    // Detect system theme preference
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setTheme(matchMedia.matches ? "dark" : "light");
 
@@ -60,61 +69,65 @@ const LineChart = ({ groupId }) => {
     return () => {
       matchMedia.removeEventListener("change", handleThemeChange);
     };
-  }, []);
+  }, [groupId]); // Re-fetch data if groupId changes
 
   return (
     <ChartContainer className={theme}>
-      <ResponsiveContainer width="100%" height="90%">
-        <RechartsLineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" />
-          <XAxis
-            dataKey="time"
-            label={{
-              value: "Time",
-              position: "insideBottomRight",
-              style: { fill: "white", fontSize: "12px" },
-              offset: -5,
-            }}
-            tick={{ fill: "var(--axis-color)", fontSize: "0.8em" }}
-            padding={{ left: 10, right: 10 }}
-          />
-          <YAxis
-            label={{
-              value: "Engagement",
-              angle: -90,
-              position: "insideLeft",
-              offset: 10,
-              style: { fill: "white", fontSize: "12px" },
-              dy: 60,
-            }}
-            tick={{ fill: "var(--axis-color)", fontSize: "0.8em" }}
-          />
-          <Tooltip
-            cursor={{ fill: "rgba(255, 255, 255, 0.1)" }}
-            contentStyle={{
-              backgroundColor: "var(--tooltip-bg)",
-              border: "none",
-              color: "var(--tooltip-color)",
-              fontSize: "0.8em",
-            }}
-            wrapperStyle={{ zIndex: 10 }}
-          />
-          <Line
-            type="monotone"
-            dataKey="engagement" // DataKey updated to reflect Engagement Trends
-            stroke="var(--line-color)"
-            strokeWidth={2}
-            dot={{ r: 4, fill: "var(--line-color)" }}
-            className="animated-line"
-          />
-        </RechartsLineChart>
-      </ResponsiveContainer>
+      {error ? ( // Show error message if data fetch fails
+        <ErrorMessage>{error}</ErrorMessage>
+      ) : (
+        <ResponsiveContainer width="100%" height="90%">
+          <RechartsLineChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" />
+            <XAxis
+              dataKey="time"
+              label={{
+                value: "Time",
+                position: "insideBottomRight",
+                style: { fill: "white", fontSize: "12px" },
+                offset: -5,
+              }}
+              tick={{ fill: "var(--axis-color)", fontSize: "0.8em" }}
+              padding={{ left: 10, right: 10 }}
+            />
+            <YAxis
+              label={{
+                value: "Engagement",
+                angle: -90,
+                position: "insideLeft",
+                offset: 10,
+                style: { fill: "white", fontSize: "12px" },
+                dy: 60,
+              }}
+              tick={{ fill: "var(--axis-color)", fontSize: "0.8em" }}
+            />
+            <Tooltip
+              cursor={{ fill: "rgba(255, 255, 255, 0.1)" }}
+              contentStyle={{
+                backgroundColor: "var(--tooltip-bg)",
+                border: "none",
+                color: "var(--tooltip-color)",
+                fontSize: "0.8em",
+              }}
+              wrapperStyle={{ zIndex: 10 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="engagement"
+              stroke="var(--line-color)"
+              strokeWidth={2}
+              dot={{ r: 4, fill: "var(--line-color)" }}
+              className="animated-line"
+            />
+          </RechartsLineChart>
+        </ResponsiveContainer>
+      )}
       <Style theme={theme} />
     </ChartContainer>
   );
 };
 
-// Styled components for LineChart
+// Styled components for the chart container
 const ChartContainer = styled.div`
   width: 100%;
   height: 100%;
@@ -139,6 +152,14 @@ const ChartContainer = styled.div`
   }
 `;
 
+// Styled error message component
+const ErrorMessage = styled.p`
+  color: red;
+  font-size: 1em;
+  text-align: center;
+`;
+
+// Animation styles for the line chart
 const Style = styled.div`
   .animated-line {
     stroke-dasharray: 500;

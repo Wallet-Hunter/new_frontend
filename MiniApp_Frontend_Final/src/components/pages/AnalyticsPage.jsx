@@ -49,10 +49,10 @@ const AnalyticsPage = () => {
           },
         }
       );
-  
+
       const result = await response.json();
       console.log("Fetched groups:", result.groups); // Debugging log
-  
+
       if (result.groups && result.groups.length > 0) {
         setGroups(result.groups); // Ensure groups are set correctly
       } else {
@@ -69,17 +69,12 @@ const AnalyticsPage = () => {
       console.log("Default selected group:", groups[0].group_id); // Debugging log
     }
   }, [groups]);
-  
-  
-
-  
-  
 
   useEffect(() => {
     if (window.Telegram && window.Telegram.WebApp) {
       const webApp = window.Telegram.WebApp;
       const telegramUser = webApp.initDataUnsafe?.user;
-  
+
       if (telegramUser) {
         const userTelegramId = telegramUser.id;
         setUserTelegramId(userTelegramId);
@@ -90,14 +85,6 @@ const AnalyticsPage = () => {
       setGroups(demoGroups); // Set demo data
     }
   }, []);
-  
-
-  
-  
-
-
-  
-
 
   const handleClick = (index) => {
     setClickedIndex(index);
