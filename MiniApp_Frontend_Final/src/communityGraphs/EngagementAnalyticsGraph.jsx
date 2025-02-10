@@ -284,44 +284,7 @@ const EngagementAnalyticsGraph = ({ groupId }) => {
             </CardContent>
           </Card>
 
-          {/*Top Engaged Members*/}
-          <Card
-            sx={{
-              backgroundColor: "#171717",
-              padding: 2,
-              height: 200,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              transition: "box-shadow 0.3s ease-in-out",
-              "&:hover": { boxShadow: "0px 4px 20px 0px #54d5d9" },
-            }}
-          >
-            <CardContent
-              sx={{
-                textAlign: "center",
-                width: "100%",
-                height: "90%",
-                color: "white",
-              }}
-            >
-              <Typography variant="h6" gutterBottom>
-                Top Engaged Members
-              </Typography>
-              <Box
-                sx={{
-                  flexGrow: 1,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "90%",
-                  width: "90%",
-                }}
-              >
-                <TopEngagedMembersChart groupId={groupId} />
-              </Box>
-            </CardContent>
-          </Card>
+          
 
           {/*Post Engagement*/}
           <Card

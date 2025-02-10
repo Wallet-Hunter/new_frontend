@@ -9,7 +9,7 @@ const BottomNavBar = () => {
   const navItems = [
     { name: "Home", icon: <FaHome />, path: "/home" },
     { name: "Analytics", icon: <FaPoll />, path: "/group" },
-    //{ name: "Events", icon: <FaCalendarAlt />, path: "/events" },
+    { name: "Events", icon: <FaCalendarAlt />, path: "/events" },
     //{ name: "Wallet", icon: <FaWallet />, path: "/wallet" },
     { name: "Profile", icon: <FaUserCircle />, path: "/profile" },
   ];

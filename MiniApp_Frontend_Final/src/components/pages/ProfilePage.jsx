@@ -157,6 +157,7 @@ const styles = {
     marginTop: "15px",
   },
   profileStat: {
+    fontFamily: "'Audiowide', serif",
     backgroundColor: "#54d5d9",
     borderRadius: "20px",
     padding: "10px 20px",
@@ -164,6 +165,7 @@ const styles = {
     alignItems: "center",
   },
   profileStatLabel: {
+    fontFamily: "'Audiowide', serif", 
     fontSize: "16px",
     color: "#fff",
     marginRight: "5px",

@@ -54,6 +54,7 @@ const AdminInfluenceChart = ({groupId}) => {
           time: date,  // X-axis
           adminInfluence: result.adminInfluencePercentage[index], // Y-axis
         }));
+        
 
         setData(transformedData);
       } catch (error) {
@@ -108,7 +109,7 @@ const AdminInfluenceChart = ({groupId}) => {
           />
           <Line
             type="monotone"
-            dataKey="adminPosts"
+            dataKey="adminInfluence"
             stroke="var(--admin-line-color)"
             strokeWidth={2}
             dot={{ r: 4, fill: "var(--admin-line-color)" }}
