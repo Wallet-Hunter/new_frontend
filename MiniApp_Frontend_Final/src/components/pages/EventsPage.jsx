@@ -1,11 +1,57 @@
 import React, { useState, useEffect } from "react";
-import {Box} from "@mui/material"
+import { Box } from "@mui/material";
 import "./EventsPage.css";
 
 const EventsPage = () => {
   const [view, setView] = useState("upcoming"); // Toggle between Upcoming and Past
-  const [events, setEvents] = useState([]);
   const [menuOpen, setMenuOpen] = useState(null); // Track which event's menu is open
+  const [events, setEvents] = useState([
+    {
+      id: 1,
+      name: "Tech Conference 2025",
+      date: "2025-03-20",
+      time: "10:00",
+      description: "A conference about the latest advancements in tech.",
+      photo: "https://via.placeholder.com/300",
+      isPast: false,
+    },
+    {
+      id: 2,
+      name: "AI & ML Workshop",
+      date: "2025-02-25",
+      time: "14:00",
+      description: "Hands-on workshop on AI and machine learning.",
+      photo: "https://via.placeholder.com/300",
+      isPast: false,
+    },
+    {
+      id: 3,
+      name: "Music Festival",
+      date: "2024-12-15",
+      time: "18:00",
+      description: "Live music performances from various artists.",
+      photo: "https://via.placeholder.com/300",
+      isPast: false,
+    },
+    {
+      id: 4,
+      name: "Hackathon 2025",
+      date: "2025-04-05",
+      time: "09:00",
+      description: "A 24-hour coding challenge for developers.",
+      photo: "https://via.placeholder.com/300",
+      isPast: false,
+    },
+    {
+      id: 5,
+      name: "Startup Networking",
+      date: "2024-11-30",
+      time: "17:00",
+      description: "Meet and connect with startup founders and investors.",
+      photo: "https://via.placeholder.com/300",
+      isPast: false,
+    },
+  ]);
 
   useEffect(() => {
     // Automatically move expired events to "Past"
@@ -30,7 +76,6 @@ const EventsPage = () => {
   const toggleMenu = (id) => {
     setMenuOpen(menuOpen === id ? null : id);
   };
-
   const styles = {
     page: {
       fontFamily: "'Poppins', sans-serif",
@@ -157,22 +202,26 @@ const EventsPage = () => {
     <Box
       sx={{
         height: "90vh",
-        width: "90vw", // Ensure it adjusts to the viewport width
+        width: "90vw",
         overflowY: "auto",
         backgroundColor: "black",
-        padding: "20px 5%", // Equal padding for left and right in percentage
+        padding: "20px 5%",
         position: "fixed",
       }}
       className="gradient-background"
     >
-      <div style={styles.page} className="gradient-background">
-        <header style={styles.header}>
+      <div className="gradient-background" style={{ fontFamily: "'Poppins', sans-serif", padding: "20px", color: "#fff", textAlign: "center" }}>
+        <header>
           <h1>Events</h1>
-          <div style={styles.toggleButtons}>
+          <div>
             <button
               style={{
-                ...styles.button,
-                ...(view === "upcoming" ? styles.activeButton : {}),
+                padding: "10px 20px",
+                margin: "5px",
+                borderRadius: "25px",
+                backgroundColor: view === "upcoming" ? "#54d5d9" : "#1f1f1f",
+                color: "#fff",
+                cursor: "pointer",
               }}
               onClick={() => setView("upcoming")}
             >
@@ -180,8 +229,12 @@ const EventsPage = () => {
             </button>
             <button
               style={{
-                ...styles.button,
-                ...(view === "past" ? styles.activeButton : {}),
+                padding: "10px 20px",
+                margin: "5px",
+                borderRadius: "25px",
+                backgroundColor: view === "past" ? "#54d5d9" : "#1f1f1f",
+                color: "#fff",
+                cursor: "pointer",
               }}
               onClick={() => setView("past")}
             >
@@ -191,38 +244,28 @@ const EventsPage = () => {
         </header>
 
         <main>
-          <div style={styles.list}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "15px", justifyContent: "center" }}>
             {events
-              .filter((event) =>
-                view === "upcoming" ? !event.isPast : event.isPast
-              )
+              .filter((event) => (view === "upcoming" ? !event.isPast : event.isPast))
               .map((event) => (
-                <div key={event.id} style={styles.card}>
+                <div key={event.id} style={{ border: "1px solid #444", borderRadius: "15px", padding: "15px", backgroundColor: "#1c1c1c", maxWidth: "300px", position: "relative", textAlign: "left" }}>
                   {event.photo ? (
-                    <img
-                      src={event.photo}
-                      alt={event.name}
-                      style={styles.image}
-                    />
+                    <img src={event.photo} alt={event.name} style={{ maxWidth: "100%", borderRadius: "10px", height: "200px", objectFit: "cover" }} />
                   ) : (
-                    <div style={styles.defaultImage}>No Image</div>
+                    <div style={{ maxWidth: "100%", height: "150px", borderRadius: "10px", backgroundColor: "#333", display: "flex", alignItems: "center", justifyContent: "center", color: "#888" }}>
+                      No Image
+                    </div>
                   )}
                   <h3>{event.name}</h3>
                   <p>{event.date}</p>
                   <p>{event.time}</p>
                   <p>{event.description}</p>
-                  <button
-                    style={styles.menuIcon}
-                    onClick={() => toggleMenu(event.id)}
-                  >
+                  <button style={{ position: "absolute", top: "10px", right: "10px", cursor: "pointer", fontSize: "20px", background: "none", border: "none", color: "#fff" }} onClick={() => toggleMenu(event.id)}>
                     ☰
                   </button>
                   {menuOpen === event.id && (
-                    <div style={styles.menuDropdown}>
-                      <div
-                        style={styles.dropdownItem}
-                        onClick={() => handleDeleteEvent(event.id)}
-                      >
+                    <div style={{ position: "absolute", top: "35px", right: "10px", backgroundColor: "#1c1c1c", border: "1px solid #444", borderRadius: "10px", padding: "10px", zIndex: 100 }}>
+                      <div style={{ cursor: "pointer", padding: "5px", color: "#fff" }} onClick={() => handleDeleteEvent(event.id)}>
                         Delete
                       </div>
                     </div>

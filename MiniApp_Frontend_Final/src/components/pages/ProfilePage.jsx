@@ -128,7 +128,7 @@ const styles = {
     width: "100px",
     height: "100px",
     borderRadius: "50%",
-    border: "4px solid rgba(0, 123, 255, 0.8)",
+    border: "4px solid #54d5d9",
     marginLeft: "15px", // Added margin to move the profile pic to the right
   },
   profileDetails: {

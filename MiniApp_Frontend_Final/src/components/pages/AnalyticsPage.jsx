@@ -32,9 +32,7 @@ const AnalyticsPage = () => {
 
   // Placeholder data for demo buttons (similar to HomePage)
   const demoGroups = [
-    { id: 1, name: "Group 1" },
-    { id: 2, name: "Group 2" },
-    { id: 3, name: "Group 3" },
+    
   ];
 
   // Fetch data from Backend
@@ -160,17 +158,24 @@ const AnalyticsPage = () => {
             onClick={() => handleGroupClick(group)} // Pass the group object to the click handler
             aria-label={`Select ${group.name}`} // Accessibility improvement
             sx={{
-              backgroundColor:
-                selectedGroup === group.id ? "#54d5d9" : "#424242",
+              backgroundColor: selectedGroup === group.id ? "#54d5d9" : "#424242",
               color: "#E0E0E0",
-              padding: "10px 20px",
+              padding: "10px 16px", // Adjust padding for dynamic size
               borderRadius: "8px",
               textTransform: "capitalize",
+              display: "inline-flex", // Ensures content aligns properly
+              alignItems: "center", // Centers text vertically
+              justifyContent: "center", // Centers text horizontally
+              minWidth: "40px", // Ensures small buttons don't shrink too much
+              height: "auto", // Allows button height to adapt to text
+              fontSize: "1rem", // Keeps font readable
+              whiteSpace: "nowrap", // Prevents text from wrapping
               "&:hover": {
                 backgroundColor: "#54d5d9",
                 color: "#FFFFFF",
               },
             }}
+            
           >
             {group.name} {/* Display group name */}
           </Button>

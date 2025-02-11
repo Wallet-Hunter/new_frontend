@@ -156,9 +156,13 @@ const HomePage = ({ userName, userScore, userLevel }) => {
     buttonContainer: {
       margin: "20px 0",
       display: "flex",
-      justifyContent: "center",
+      justifyContent: "flex-start", // Ensures starting buttons are visible
       gap: "10px",
+      overflowX: "auto", // Enables horizontal scrolling
+      whiteSpace: "nowrap", // Prevents buttons from wrapping
+      paddingBottom: "10px", // Adds space for better scrolling visibility
     },
+    
     button: {
       borderRadius: "20px",
       padding: "10px 20px",
