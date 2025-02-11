@@ -172,7 +172,7 @@ const BubbleChart = ({ group_id }) => {
 
     bubble
       .append("circle")
-      .attr("r", (d) => d.r * 1.5)
+      .attr("r", (d) => d.r)
       .attr("fill", "none")
       .attr("stroke", (d) => d.data.color)
       .attr("stroke-width", 0.5);
@@ -184,8 +184,7 @@ const BubbleChart = ({ group_id }) => {
       .text((d) => d.data.name)
       .style("fill", (d) => d.data.color)
       .style('font-weight', 'bold') 
-      .attr("font-size", (d) => `${Math.min(d.r / 4, 15)}px`)
-
+      .attr("font-size", (d) => `${Math.min(d.r / 4, 10)}px`)
       .attr("pointer-events", "all");
 
     bubble
@@ -195,8 +194,7 @@ const BubbleChart = ({ group_id }) => {
       .text((d) => `${d.data.value}%`)
       .style("fill", (d) => d.data.color)
       .style("fill-opacity", 0.7)
-      .style('font-weight', 'bold') 
-      .attr("font-size", (d) => `${Math.min(d.r / 5, 8)}px`)
+      .attr("font-size", (d) => `${Math.min(d.r / 4, 8)}px`)
       .attr("pointer-events", "none");
 
     return () => {
