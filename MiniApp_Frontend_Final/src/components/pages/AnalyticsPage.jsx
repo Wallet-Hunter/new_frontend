@@ -145,42 +145,62 @@ const AnalyticsPage = () => {
       </Typography>
 
       {/* Group Buttons */}
-      <Box display="flex" gap="10px" marginBottom="20px">
-        {(groups && groups.length > 0
-          ? groups.map((group) => ({
-              id: group.group_id, // Map backend's group_id to id
-              name: group.group_title, // Map backend's group_title to name
-            }))
-          : demoGroups
-        ).map((group) => (
-          <Button
-            key={group.id} // Use normalized group.id as the key
-            onClick={() => handleGroupClick(group)} // Pass the group object to the click handler
-            aria-label={`Select ${group.name}`} // Accessibility improvement
-            sx={{
-              backgroundColor: selectedGroup === group.id ? "#54d5d9" : "#424242",
-              color: "#E0E0E0",
-              padding: "10px 16px", // Adjust padding for dynamic size
-              borderRadius: "8px",
-              textTransform: "capitalize",
-              display: "inline-flex", // Ensures content aligns properly
-              alignItems: "center", // Centers text vertically
-              justifyContent: "center", // Centers text horizontally
-              minWidth: "40px", // Ensures small buttons don't shrink too much
-              height: "auto", // Allows button height to adapt to text
-              fontSize: "1rem", // Keeps font readable
-              whiteSpace: "nowrap", // Prevents text from wrapping
-              "&:hover": {
-                backgroundColor: "#54d5d9",
-                color: "#FFFFFF",
-              },
-            }}
-            
-          >
-            {group.name} {/* Display group name */}
-          </Button>
-        ))}
-      </Box>
+      <Box
+  sx={{
+    display: "flex",
+    gap: "10px",
+    marginBottom: "20px",
+    overflowX: "auto", // Enables horizontal scrolling
+    whiteSpace: "nowrap", // Prevents buttons from wrapping
+    paddingBottom: "5px", // Adds padding for better spacing
+    scrollbarWidth: "thin", // Adjusts scrollbar width (Firefox)
+    "&::-webkit-scrollbar": {
+      height: "6px", // Adjust scrollbar height (Chrome, Edge, Safari)
+    },
+    "&::-webkit-scrollbar-thumb": {
+      backgroundColor: "#54d5d9", // Custom scrollbar color
+      borderRadius: "3px",
+    },
+  }}
+>
+  {(groups && groups.length > 0
+    ? groups.map((group) => ({
+        id: group.group_id,
+        name: group.group_title,
+      }))
+    : demoGroups
+  ).map((group) => (
+    <Button
+      key={group.id}
+      onClick={() => handleGroupClick(group)}
+      sx={{
+        backgroundColor: selectedGroup === group.id ? "#54d5d9" : "#424242",
+        color: "#E0E0E0",
+        padding: "10px 16px",
+        borderRadius: "8px",
+        textTransform: "capitalize",
+        minWidth: "fit-content", // Adjusts to content size
+        maxWidth: "100%", // Prevents excessive stretching
+        height: "auto",
+        fontSize: "1rem",
+        whiteSpace: "normal", // Allows wrapping for long text
+        overflow: "visible", // Ensures text isn't hidden
+        textOverflow: "clip", // Prevents cutting off text
+        display: "inline-flex", // Ensures proper sizing with flex behavior
+        alignItems: "center", // Keeps text centered
+        "&:hover": {
+          backgroundColor: "#54d5d9",
+          color: "#FFFFFF",
+        },
+      }}
+      
+      
+    >
+      {group.name}
+    </Button>
+  ))}
+</Box>
+
 
       {/* Divider Line */}
       <Box
