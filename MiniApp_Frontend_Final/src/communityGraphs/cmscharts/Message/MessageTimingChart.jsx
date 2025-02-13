@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 // Dynamic HeatMap component
-const HeatMap = ({ theme }) => {
+const HeatMap = ({ theme,groupId }) => {
   const [tooltip, setTooltip] = useState({ visible: false, content: '', top: 0, left: 0 });
   const [hourlyCounts, setHourlyCounts] = useState([]);
   const currentDate = new Date();
@@ -13,25 +13,33 @@ const HeatMap = ({ theme }) => {
   const fetchData = async () => {
     try {
       const response = await fetch(
-        '${process.env.REACT_APP_SERVER_URL}/graphs/messages/messagetiming?group_id=${group_id}',
+        `${process.env.REACT_APP_SERVER_URL}/graphs/message/messagetiming?group_id=${groupId}`,
         {
           method: 'GET',
-          //credentials: 'include',
+          // credentials: 'include',
         }
       );
-
+  
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-
+  
       const result = await response.json();
-      // Set the hourly counts based on backend response
-      setHourlyCounts(result[currentMonth] || []);
-      console.log("Data successfully fetched from the backend:", result);
+  
+      // Transform response into an array indexed by hour
+      const hourlyCountsMap = Array(24).fill(0); // Initialize array with 24 zeroes
+  
+      result.forEach(({ hour_of_day, message_frequency }) => {
+        hourlyCountsMap[hour_of_day] = message_frequency; // Assign count to correct hour
+      });
+  
+      setHourlyCounts(hourlyCountsMap);
+      console.log("Data successfully mapped to hourlyCounts:", hourlyCountsMap);
     } catch (error) {
       console.error("Error fetching data:", error.message);
     }
   };
+  
 
   useEffect(() => {
     fetchData();

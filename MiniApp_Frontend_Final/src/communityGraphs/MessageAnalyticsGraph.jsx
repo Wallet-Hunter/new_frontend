@@ -69,7 +69,7 @@ const MessageAnalyticsGraph = ({
           }}
         >
           <CardContent sx={{ padding: 0, paddingTop: 2 }}>
-            <Leaderboard />
+            <Leaderboard groupId={groupId}/>
           </CardContent>
         </Card>
       </Box>
@@ -166,7 +166,7 @@ const MessageAnalyticsGraph = ({
         </Card>
 
         {/*Most Active Users*/}
-        <Card
+        {/* <Card
           sx={{
             backgroundColor: "#171717",
             padding: 2,
@@ -203,7 +203,7 @@ const MessageAnalyticsGraph = ({
               <MostActiveUsersChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Message Timing*/}
         <Card

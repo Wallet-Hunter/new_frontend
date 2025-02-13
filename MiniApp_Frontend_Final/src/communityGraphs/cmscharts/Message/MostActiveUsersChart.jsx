@@ -27,7 +27,7 @@ const MostActiveUsersChart = ({
   // Fetch data from BigQuery (commented out for now)
   const fetchData = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/graphs/messages/mostactiveusers?group_id=${groupId}`, {
+      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/graphs/message/mostactiveusers?group_id=${groupId}`, {
         method: "GET",
         //credentials: "include", // Include credentials (cookies, etc.)
       });

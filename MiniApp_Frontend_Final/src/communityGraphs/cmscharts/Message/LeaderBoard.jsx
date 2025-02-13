@@ -16,17 +16,16 @@ import {
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   transition: "0.3s",
   "&:hover": {
-    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)", // Box shadow on hover
-    backgroundColor: "rgba(255, 255, 255, 0.1)", // Slightly change background color on hover
+    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
   },
 }));
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  color: "white", // Default white text
-  borderBottom: "1px solid rgba(255, 255, 255, 0.1)", // Subtle border for separation
+  color: "white",
+  borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
 }));
 
-// Badges for top three ranks
 const Badge = styled("span")(({ theme }) => ({
   borderRadius: "12px",
   padding: "4px 8px",
@@ -36,48 +35,58 @@ const Badge = styled("span")(({ theme }) => ({
   marginRight: "8px",
 }));
 
-const ActiveUsers = () => {
+const ActiveUsers = ({groupId}) => {
   const [activeUsersData, setActiveUsersData] = useState([]);
 
   // Fetch data from backend
   const fetchData = async () => {
     try {
       const response = await fetch(
-        "https://b653-27-6-209-17.ngrok-free.app/graphs/messages/leaderboard?{group_id}",
-        {
-          method: "GET",
-          //credentials: "include", // Include credentials (cookies, etc.)
-        }
+        `${process.env.REACT_APP_SERVER_URL}/graphs/message/mostactiveusers?group_id=${groupId}`,
+        { method: "GET" }
       );
-
-      // Parse the JSON response
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
       const result = await response.json();
-      setActiveUsersData(result); // Set the fetched data
-      console.log("Data successfully fetched from the backend:");
-      console.log(result); // Log the result for debugging
+  
+      // Extract user names and message counts from the API response
+      const activeUsers = result.map((item) => ({
+        userName: item.sender_name,
+        messagesSent: item.total_messages_sent,
+      }));
+  
+      // Sort and store top active users
+      const sortedUsers = activeUsers.sort((a, b) => b.messagesSent - a.messagesSent).slice(0, 5);
+      setActiveUsersData(sortedUsers);
+  
+      console.log("Processed Data:", sortedUsers);
     } catch (error) {
       console.error("Error fetching data:", error.message);
     }
   };
+  
 
   useEffect(() => {
-    fetchData(); // Fetch data when the component mounts
+    fetchData();
   }, []);
 
-  // Sort the data by messages sent in descending order
-  const topActiveUsers = activeUsersData
+  // Sort and limit to top 5 active users
+  const topActiveUsers = [...activeUsersData]
     .sort((a, b) => b.messagesSent - a.messagesSent)
-    .slice(0, 5); // Limit to top 5 active users
+    .slice(0, 5);
 
   // Custom styles for rank highlighting
   const getRowStyle = (index) => {
     switch (index) {
       case 0:
-        return { backgroundColor: "#76dde1" }; // Gold for 1st
+        return { backgroundColor: "#76dde1" };
       case 1:
-        return { backgroundColor: "#54d5d9" }; // Silver for 2nd
+        return { backgroundColor: "#54d5d9" };
       case 2:
-        return { backgroundColor: "#43aaae" }; // Bronze for 3rd
+        return { backgroundColor: "#43aaae" };
       default:
         return {};
     }
@@ -87,7 +96,7 @@ const ActiveUsers = () => {
     <Box
       sx={{
         width: "100%",
-        maxHeight: "50%", // Ensure it does not exceed the parent container
+        maxHeight: "50%",
         overflow: "hidden",
         borderRadius: "8px",
         boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
@@ -107,74 +116,45 @@ const ActiveUsers = () => {
         Top Active Users
       </Typography>
 
-      {/* Scrollable table container */}
       <TableContainer
         component={Paper}
         elevation={0}
         sx={{
           borderRadius: "8px",
-          overflowY: "auto", // Scrollable when content overflows
-          maxHeight: "300px", // Adjust maxHeight to control visible rows
+          overflowY: "auto",
+          maxHeight: "300px",
           backgroundColor: "#171717",
         }}
       >
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell
-                sx={{
-                  backgroundColor: "#333333", // Dark background
-                  color: "white", // White text
-                  fontWeight: "bold", // Bold font for better visibility
-                }}
-              >
-                Rank
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "#333333", // Dark background
-                  color: "white", // White text
-                  fontWeight: "bold", // Bold font for better visibility
-                }}
-              >
-                User
-              </TableCell>
-              <TableCell
-                align="right"
-                sx={{
-                  backgroundColor: "#333333", // Dark background
-                  color: "white", // White text
-                  fontWeight: "bold", // Bold font for better visibility
-                }}
-              >
-                Messages Sent
-              </TableCell>
+              {["Rank", "User", "Messages Sent"].map((header) => (
+                <TableCell
+                  key={header}
+                  sx={{
+                    backgroundColor: "#333333",
+                    color: "white",
+                    fontWeight: "bold",
+                  }}
+                  align={header === "Messages Sent" ? "right" : "left"}
+                >
+                  {header}
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
             {topActiveUsers.map((user, index) => (
-              <StyledTableRow
-                key={user.userId}
-                sx={{
-                  ...getRowStyle(index), // Apply custom row styles for top 3 users
-                }}
-              >
+              <StyledTableRow key={index} sx={getRowStyle(index)}>
                 <StyledTableCell>
                   {index + 1}
-                  {index === 0 && (
-                    <Badge style={{ backgroundColor: "#76dde1" }}>🏆</Badge>
-                  )}
-                  {index === 1 && (
-                    <Badge style={{ backgroundColor: "#54d5d9" }}>🥈</Badge>
-                  )}
-                  {index === 2 && (
-                    <Badge style={{ backgroundColor: "#43aaae" }}>🥉</Badge>
-                  )}
+                  {index === 0 && <Badge style={{ backgroundColor: "#76dde1" }}>🏆</Badge>}
+                  {index === 1 && <Badge style={{ backgroundColor: "#54d5d9" }}>🥈</Badge>}
+                  {index === 2 && <Badge style={{ backgroundColor: "#43aaae" }}>🥉</Badge>}
                 </StyledTableCell>
                 <StyledTableCell>{user.userName}</StyledTableCell>
-                <StyledTableCell align="right">
-                  {user.messagesSent}
-                </StyledTableCell>
+                <StyledTableCell align="right">{user.messagesSent}</StyledTableCell>
               </StyledTableRow>
             ))}
           </TableBody>
