@@ -286,7 +286,7 @@ const MessageAnalyticsGraph = ({
         </Card>
 
         {/*Message Threads*/}
-        <Card
+        {/* <Card
           sx={{
             backgroundColor: "#171717",
             padding: 2,
@@ -323,10 +323,10 @@ const MessageAnalyticsGraph = ({
               <MessageThreadsChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Message Replies*/}
-        <Card
+        {/* <Card
           sx={{
             backgroundColor: "#171717",
             padding: 2,
@@ -363,7 +363,7 @@ const MessageAnalyticsGraph = ({
               <MessageRepliesChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Message Sentiment*/}
         <Card

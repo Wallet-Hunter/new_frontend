@@ -48,7 +48,7 @@ const AnonymousAnalyticsGraph = ({ groupId }) => {
           }}
         >
           <CardContent>
-            <Leaderboard />
+            <Leaderboard groupId={groupId}/>
           </CardContent>
         </Card>
       </Box>

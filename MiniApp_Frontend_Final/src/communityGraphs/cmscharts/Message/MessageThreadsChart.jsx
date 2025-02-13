@@ -10,7 +10,7 @@ import {
 } from 'recharts';
 import styled from 'styled-components';
 
-const MessageThreadsChart = () => {
+const MessageThreadsChart = ({groupId}) => {
   const [theme, setTheme] = useState("light");
   const [data, setData] = useState([]); // Start with an empty array for data
 
@@ -18,7 +18,7 @@ const MessageThreadsChart = () => {
   const fetchData = async () => {
     try {
       const response = await fetch(
-        '${process.env.REACT_APP_SERVER_URL}/graphs/messages/messagethreads?group_id=${group_id}',
+        `${process.env.REACT_APP_SERVER_URL}/graphs/message/messageThreads?group_id=${groupId}`,
         {
           method: "GET",
           //credentials: "include", // Include credentials (cookies, etc.)
@@ -44,7 +44,7 @@ const MessageThreadsChart = () => {
   // Fetch data on component mount
   useEffect(() => {
     fetchData();
-  }, []); // Fetch data only once when the component mounts
+  }, [groupId]); // Fetch data only once when the component mounts
 
   useEffect(() => {
     // Set theme based on system preference

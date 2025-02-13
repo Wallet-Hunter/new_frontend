@@ -14,8 +14,8 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend, Title)
 
 const AnonymousUserInteractionChart = ({
   groupId,
-  backgroundColorLight = ["rgba(75, 192, 192, 1)", "rgba(67, 229, 244, 1)", "rgba(255, 165, 0, 1)"], // Light mode colors for Replies, Forwards, Views
-  backgroundColorDark = ["rgba(67, 229, 244, 1)", "rgba(75, 192, 192, 1)", "rgba(255, 99, 71, 1)"], // Dark mode colors for Replies, Forwards, Views
+  backgroundColorLight = ["rgba(75, 192, 192, 1)", "rgba(67, 229, 244, 1)", "rgba(85, 249, 244, 1)"], // Light mode colors for Replies, Forwards, Views
+  backgroundColorDark = ["rgba(67, 229, 244, 1)", "rgba(75, 192, 192, 1)", "rgba(85, 249, 244, 1)"], // Dark mode colors for Replies, Forwards, Views
 }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [chartData, setChartData] = useState({
@@ -122,7 +122,7 @@ const AnonymousUserInteractionChart = ({
     return () => {
       matchMedia.removeEventListener("change", handleChange);
     };
-  }, []);
+  }, [groupId]);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
@@ -143,7 +143,7 @@ const AnonymousUserInteractionChart = ({
             },
             plugins: {
               legend: {
-                display: true, // Displaying the legend
+                display: false, // Displaying the legend
               },
               tooltip: {
                 callbacks: {

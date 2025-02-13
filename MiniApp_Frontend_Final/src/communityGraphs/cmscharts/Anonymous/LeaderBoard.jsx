@@ -36,34 +36,32 @@ const Badge = styled("span")(({ theme }) => ({
 
 const TopAnonymousContributors = ({ groupId }) => {
   const [kolData, setKOLData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchKOLData = async () => {
-      console.log("Fetching data from API...");
       try {
         const response = await fetch(
           `${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/topanonymouscontributors?group_id=${groupId}`
         );
-  
-        console.log("Response status:", response.status);
+        
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        
         const data = await response.json();
-        console.log("API Response Data:", data);
-  
         if (!Array.isArray(data)) throw new Error("Invalid API response format");
-  
+        
         setKOLData(data);
       } catch (error) {
         console.error("Error fetching KOL data:", error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
       }
     };
-  
+
     if (groupId) fetchKOLData();
   }, [groupId]);
-  
-
-  const topContributors = [...kolData]
-    .sort((a, b) => b.message_count - a.message_count)
-    .slice(0, 5);
 
   const getRowStyle = (index) => {
     switch (index) {
@@ -93,64 +91,48 @@ const TopAnonymousContributors = ({ groupId }) => {
     >
       <Typography
         variant="h5"
-        sx={{
-          marginBottom: 2,
-          textAlign: "center",
-          color: "white",
-          fontWeight: "bold",
-        }}
+        sx={{ marginBottom: 2, textAlign: "center", color: "white", fontWeight: "bold" }}
       >
         Top Anonymous Contributors
       </Typography>
 
-      <TableContainer
-        component={Paper}
-        elevation={0}
-        sx={{
-          borderRadius: "8px",
-          overflowY: "auto",
-          maxHeight: "500px",
-          backgroundColor: "#171717",
-        }}
-      >
-        <Table stickyHeader>
-          <TableHead>
-            <TableRow>
-              <TableCell
-                sx={{ backgroundColor: "#333333", color: "white", fontWeight: "bold" }}
-              >
-                Rank
-              </TableCell>
-              <TableCell
-                sx={{ backgroundColor: "#333333", color: "white", fontWeight: "bold" }}
-              >
-                Anonymous Members
-              </TableCell>
-              <TableCell
-                align="right"
-                sx={{ backgroundColor: "#333333", color: "white", fontWeight: "bold" }}
-              >
-                Number of Posts
-              </TableCell>
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {topContributors.map((kol, index) => (
-              <StyledTableRow key={kol.anonymous_member} sx={{ ...getRowStyle(index) }}>
-                <StyledTableCell>
-                  {index + 1}
-                  {index === 0 && <Badge style={{ backgroundColor: "#76dde1" }}>🏆</Badge>}
-                  {index === 1 && <Badge style={{ backgroundColor: "#54d5d9" }}>🥈</Badge>}
-                  {index === 2 && <Badge style={{ backgroundColor: "#43aaae" }}>🥉</Badge>}
-                </StyledTableCell>
-                <StyledTableCell>{kol.anonymous_member}</StyledTableCell>
-                <StyledTableCell align="right">{kol.message_count}</StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      {loading ? (
+        <Typography sx={{ color: "white", textAlign: "center" }}>Loading...</Typography>
+      ) : error ? (
+        <Typography sx={{ color: "red", textAlign: "center" }}>{error}</Typography>
+      ) : kolData.length === 0 ? (
+        <Typography sx={{ color: "white", textAlign: "center" }}>No data available</Typography>
+      ) : (
+        <TableContainer
+          component={Paper}
+          elevation={0}
+          sx={{ borderRadius: "8px", overflowY: "auto", maxHeight: "500px", backgroundColor: "#171717" }}
+        >
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ backgroundColor: "#333333", color: "white", fontWeight: "bold" }}>Rank</TableCell>
+                <TableCell sx={{ backgroundColor: "#333333", color: "white", fontWeight: "bold" }}>Anonymous Members</TableCell>
+                <TableCell align="right" sx={{ backgroundColor: "#333333", color: "white", fontWeight: "bold" }}>Number of Posts</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {kolData.map((kol, index) => (
+                <StyledTableRow key={kol.anonymous_member} sx={{ ...getRowStyle(index) }}>
+                  <StyledTableCell>
+                    {index + 1}
+                    {index === 0 && <Badge style={{ backgroundColor: "#76dde1" }}>🏆</Badge>}
+                    {index === 1 && <Badge style={{ backgroundColor: "#54d5d9" }}>🥈</Badge>}
+                    {index === 2 && <Badge style={{ backgroundColor: "#43aaae" }}>🥉</Badge>}
+                  </StyledTableCell>
+                  <StyledTableCell>{kol.anonymous_member}</StyledTableCell>
+                  <StyledTableCell align="right">{kol.message_count}</StyledTableCell>
+                </StyledTableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
     </Box>
   );
 };

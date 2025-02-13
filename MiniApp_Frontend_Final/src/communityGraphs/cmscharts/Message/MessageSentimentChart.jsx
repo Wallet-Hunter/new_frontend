@@ -7,62 +7,48 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 const MessageSentimentChart = ({ title, groupId }) => {
   const [theme, setTheme] = useState("light");
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const [data, setData] = useState({
+    labels: [],
+    values: [],
+  });
 
-  // Fetch data from Backend
+  // Fixed Sentiment Colors
+  const sentimentColors = {
+    positive: "#54d5d9",
+    neutral: "#f7d154",
+    negative: "#43aaae",
+  };
+
+  // Function to fetch data from backend
   const fetchData = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_URL}/graphs/messages/messagesentiment?group_id=${groupId}`,
-        {
-          method: "GET",
-          //credentials: "include", // Include credentials (cookies, etc.)
-        }
+        `${process.env.REACT_APP_SERVER_URL}/graphs/message/messageSentiment?group_id=${groupId}`
       );
 
-      // Parse the JSON response
       const result = await response.json();
-      setData(result); // Set the fetched data
-      console.log("Data successfully fetched from the backend:");
-      console.log(result); // Log the result for debugging
+
+      if (result.length > 0) {
+        const sentimentData = result[0]; // Accessing first object
+
+        // Update chart data
+        setData({
+          labels: ["Neutral", "Positive", "Negative"],
+          values: [
+            sentimentData.neutral_count,
+            sentimentData.positive_count,
+            sentimentData.negative_count,
+          ],
+        });
+      }
+
+      console.log("Data successfully fetched from the backend:", result);
     } catch (error) {
       console.error("Error fetching data:", error.message);
     }
   };
 
-  const [data, setData] = useState({
-    labels: [],
-    values: [], // Example sentiment counts for testing
-  });
-
-  // Dynamically calculate the total
-  const totalValue = data.values.reduce((acc, value) => acc + value, 0);
-
-  useEffect(() => {
-    const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
-    setTheme(matchMedia.matches ? "dark" : "light");
-
-    const handleThemeChange = (e) => {
-      setTheme(e.matches ? "dark" : "light");
-    };
-
-    matchMedia.addEventListener("change", handleThemeChange);
-    fetchData(); // Call the fetchData function on component mount
-    return () => {
-      matchMedia.removeEventListener("change", handleThemeChange);
-    };
-  }, [groupId]); // Re-fetch data when groupId changes
-
-  const themeColors = [
-    "#45e8ed", "#69edf1", "#8df2f5", "#b0f7f8", "#d4fbfc", "#54d5d9", "#3fb3b5", "#2c9393",
-    "#2db7ba", "#229ca1", "#1c8084", "#176364", "#11494c", "#0d3738", "#091f21", "#0b4a4c"
-  ];
-
-  const getColor = (value, max) => {
-    const ratio = value / max;
-    const index = Math.min(Math.floor(ratio * (themeColors.length - 1)), themeColors.length - 1);
-    return themeColors[index];
-  };
-
+  // Get lighter hover color
   const lightenColor = (color, amount) => {
     const num = parseInt(color.slice(1), 16);
     const r = Math.min(255, (num >> 16) + amount);
@@ -71,8 +57,33 @@ const MessageSentimentChart = ({ title, groupId }) => {
     return `#${(1 << 24 | (r << 16) | (g << 8) | b).toString(16).slice(1)}`;
   };
 
-  const maxValue = Math.max(...data.values);
-  const baseColors = data.values.map(value => getColor(value, maxValue));
+  // Calculate total value
+  const totalValue = data.values.reduce((acc, value) => acc + value, 0);
+
+  useEffect(() => {
+    // Detect theme
+    const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
+    setTheme(matchMedia.matches ? "dark" : "light");
+
+    const handleThemeChange = (e) => {
+      setTheme(e.matches ? "dark" : "light");
+    };
+
+    matchMedia.addEventListener("change", handleThemeChange);
+    fetchData(); // Fetch data on component mount
+
+    return () => {
+      matchMedia.removeEventListener("change", handleThemeChange);
+    };
+  }, [groupId]); // Refetch data when groupId changes
+
+  // Assign colors based on sentiment order
+  const baseColors = [
+    sentimentColors.neutral,
+    sentimentColors.positive,
+    sentimentColors.negative,
+  ];
+
   const hoverColors = baseColors.map(color => lightenColor(color, 30));
 
   const chartData = {
@@ -96,9 +107,7 @@ const MessageSentimentChart = ({ title, groupId }) => {
     maintainAspectRatio: false,
     cutout: "70%", // Hollow center
     plugins: {
-      legend: {
-        display: false, // Hide legend
-      },
+      legend: { display: false },
       tooltip: {
         backgroundColor: theme === "dark" ? "#333" : "#FFF",
         titleColor: theme === "dark" ? "#FFF" : "#000",
@@ -129,7 +138,7 @@ const MessageSentimentChart = ({ title, groupId }) => {
 
   return (
     <div style={chartContainerStyle}>
-      {title && <h2 style={titleStyle}>{title}</h2>} {/* Conditionally display title */}
+      {title && <h2 style={titleStyle}>{title}</h2>}
       <div style={{ position: 'relative', width: '100%', height: '90%' }}>
         <Doughnut data={chartData} options={options} />
         <div style={detailsStyle}>

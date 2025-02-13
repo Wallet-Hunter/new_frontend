@@ -4,7 +4,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const MessageTypeChart = ({ title, group_id }) => {
+const MessageTypeChart = ({ title, groupId }) => {
   const [theme, setTheme] = useState("light");
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [data, setData] = useState({ labels: [], values: [] });
@@ -13,33 +13,40 @@ const MessageTypeChart = ({ title, group_id }) => {
   const fetchData = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_URL}/graphs/messages/messagetypes?group_id=${group_id}`,
-        {
-          method: "GET",
-          //credentials: "include", // Include credentials (cookies, etc.)
-        }
+        `${process.env.REACT_APP_SERVER_URL}/graphs/message/messageTypes?group_id=${groupId}`,
+        { method: "GET" }
       );
-
+  
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
+  
       const result = await response.json();
-
-      // Assuming the response has `labels` and `values` in the correct format
-      setData({
-        labels: result.labels || [],
-        values: result.values || [],
-      });
-
-      console.log("Data successfully fetched from the backend:", result);
+  
+      // Convert the API response into labels and values
+      if (Array.isArray(result) && result.length > 0) {
+        const firstItem = result[0]; // Since API returns an array, use the first object
+  
+        const labels = Object.keys(firstItem).map(key =>
+          key.replace("_count", "").toUpperCase() // Format labels nicely
+        );
+  
+        const values = Object.values(firstItem);
+  
+        setData({ labels, values });
+      } else {
+        setData({ labels: [], values: [] }); // Handle empty response
+      }
+  
+      console.log("Data successfully fetched and transformed:", result);
     } catch (error) {
       console.error("Error fetching data:", error.message);
     }
   };
+  
 
   useEffect(() => {
-    fetchData(); // Fetch data when the component mounts
+    fetchData();
 
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setTheme(matchMedia.matches ? "dark" : "light");
@@ -52,7 +59,7 @@ const MessageTypeChart = ({ title, group_id }) => {
     return () => {
       matchMedia.removeEventListener("change", handleThemeChange);
     };
-  }, [group_id]);
+  }, [groupId]);
 
   const totalValue = data.values.reduce((acc, value) => acc + value, 0);
 
@@ -62,7 +69,7 @@ const MessageTypeChart = ({ title, group_id }) => {
   ];
 
   const getColor = (value, max) => {
-    const ratio = value / max;
+    const ratio = max > 0 ? value / max : 0;
     const index = Math.min(Math.floor(ratio * (themeColors.length - 1)), themeColors.length - 1);
     return themeColors[index];
   };
@@ -75,7 +82,7 @@ const MessageTypeChart = ({ title, group_id }) => {
     return `#${(1 << 24 | (r << 16) | (g << 8) | b).toString(16).slice(1)}`;
   };
 
-  const maxValue = Math.max(...data.values);
+  const maxValue = Math.max(...data.values, 1); // Prevent division by zero
   const baseColors = data.values.map(value => getColor(value, maxValue));
   const hoverColors = baseColors.map(color => lightenColor(color, 30));
 
@@ -100,9 +107,7 @@ const MessageTypeChart = ({ title, group_id }) => {
     maintainAspectRatio: false,
     cutout: "70%", // Hollow center
     plugins: {
-      legend: {
-        display: false,
-      },
+      legend: { display: false },
       tooltip: {
         backgroundColor: theme === "dark" ? "#333" : "#FFF",
         titleColor: theme === "dark" ? "#FFF" : "#000",

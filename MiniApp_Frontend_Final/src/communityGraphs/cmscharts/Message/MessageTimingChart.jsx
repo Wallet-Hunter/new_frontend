@@ -43,7 +43,7 @@ const HeatMap = ({ theme,groupId }) => {
 
   useEffect(() => {
     fetchData();
-  }, [currentMonth]);
+  }, [currentMonth,groupId]);
 
   const renderHours = () => {
     return Array.from({ length: 24 }, (_, index) => {

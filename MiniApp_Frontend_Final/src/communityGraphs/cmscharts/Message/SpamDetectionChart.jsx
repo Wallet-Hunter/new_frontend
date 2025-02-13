@@ -12,6 +12,7 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 const SpamDetectionChart = ({
+  groupId,
   spamCategories = [], // Spam categories (e.g., repetition, irrelevant content)
   spamCounts = [], // Count of spam messages for each category
   backgroundColorLight = "rgba(75, 192, 192, 1)",
@@ -26,23 +27,31 @@ const SpamDetectionChart = ({
   // Fetch data from Backend
   const fetchData = async () => {
     try {
-      const response = await fetch('${process.env.REACT_APP_SERVER_URL}/graphs/messages/spamdetection?group_id=${group_id}', {
-        method: "GET",
-        //credentials: "include", // Include credentials (cookies, etc.)
-      });
-
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/graphs/message/spamDetection?group_id=${groupId}`,
+        {
+          method: "GET",
+        }
+      );
+  
       // Parse the JSON response
       const result = await response.json();
-
-      // Set the data state with the response
-      setData(result);
-
-      console.log("Data successfully fetched from the backend:");
-      console.log(result); // Log the result for debugging
+  
+      // Convert response into the required format
+      const formattedData = {
+        categories: ["Spam", "Non-Spam"],  // Labels
+        counts: [result.total_spam_count, result.total_non_spam_count], // Values
+      };
+  
+      // Set the data state with formatted values
+      setData(formattedData);
+  
+      console.log("Data successfully fetched and formatted:", formattedData); // Debugging log
     } catch (error) {
       console.error("Error fetching data:", error.message);
     }
   };
+  
 
   // Hardcoded data for testing (commented out)
   // const hardcodedData = {
@@ -63,21 +72,22 @@ const SpamDetectionChart = ({
     return () => {
       matchMedia.removeEventListener("change", handleChange);
     };
-  }, []);
+  }, [groupId]);
 
   // Chart data configuration
   const chartData = {
-    labels: data.categories, // Spam categories as X-axis labels
+    labels: data.categories, // ["Spam", "Non-Spam"]
     datasets: [
       {
-        label: "Count of Spam Messages", // Dataset label
-        data: data.counts, // Count of spam messages for each category
+        label: "Message Count",
+        data: data.counts, // [spam count, non-spam count]
         backgroundColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
         borderColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
         borderWidth: 1,
       },
     ],
   };
+  
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
