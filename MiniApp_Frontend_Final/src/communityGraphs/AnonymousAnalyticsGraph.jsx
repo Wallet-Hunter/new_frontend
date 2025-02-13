@@ -464,7 +464,7 @@ const AnonymousAnalyticsGraph = ({ groupId }) => {
         </Card>
 
         {/*Group Culture with Anonymity*/}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             height: "200px",
@@ -501,7 +501,7 @@ const AnonymousAnalyticsGraph = ({ groupId }) => {
               <GroupCultureChart groupId = {groupId}/>
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
       </Box>
     </Box>
   );
