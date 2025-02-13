@@ -172,7 +172,7 @@ const BubbleChart = ({ group_id }) => {
 
     bubble
       .append("circle")
-      .attr("r", (d) => d.r)
+      .attr("r", (d) => Math.max(d.r, 5))
       .attr("fill", "none")
       .attr("stroke", (d) => d.data.color)
       .attr("stroke-width", 0.5);

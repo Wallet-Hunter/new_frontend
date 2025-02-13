@@ -34,12 +34,10 @@ const TotalAnonymousMessagesNumberCard = ({ title , groupId}) => {
   }
 
   return (
-    <Card sx={{ minWidth: 275, padding: 2, backgroundColor: '#fff', color: 'green.500' }}>
+    <Card sx={{ minWidth: 275, padding: 2, backgroundColor: 'transparent', color: 'green.500' }}>
       <CardContent>
-        <Typography variant="h6" component="div">
-          {title || 'Total Anonymous Messages'} {/* Title passed via props or fallback */}
-        </Typography>
-        <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
+        
+        <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: 'white' }}>
           {totalAnonymousMessages} {/* Display the totalAnonymousMessages value */}
         </Typography>
       </CardContent>

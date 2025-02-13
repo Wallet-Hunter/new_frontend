@@ -329,7 +329,7 @@ const EngagementAnalyticsGraph = ({ groupId }) => {
           </Card>
 
           {/*Engagement by Content Type*/}
-          <Card
+          {/* <Card
             sx={{
               backgroundColor: "#171717",
               padding: 2,
@@ -365,7 +365,7 @@ const EngagementAnalyticsGraph = ({ groupId }) => {
                 <EngagementByContentTypeChart groupId={groupId} />
               </Box>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/*Sentiment Analysis*/}
           <Card

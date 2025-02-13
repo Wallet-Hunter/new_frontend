@@ -33,7 +33,7 @@ const ReactionsAnalysisChart = ({ groupId }) => {
  const fetchData = async () => {
   try {
     const response = await fetch(
-      `${process.env.REACT_APP_SERVER_URL}/graphs/engagement/ReactionAnalysis?group_id=${groupId}`, 
+      `${process.env.REACT_APP_SERVER_URL}/graphs/engagement/reactionsanalysis?group_id=${groupId}`, 
       { method: "GET" }
     );
 
