@@ -12,43 +12,39 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 const SpamBehaviorChart = ({
-  senderNames = [], // Sender names as Y-axis labels
-  spamCounts = [], // Number of spam messages for each sender
+  groupId,
   backgroundColorLight = "rgba(75, 192, 192, 1)",
   backgroundColorDark = "rgba(67, 229, 244, 1)",
 }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [data, setData] = useState({
-    senderNames: ["Alice", "Bob", "Charlie"], // Hardcoded for testing
-    spamCounts: [5, 12, 8], // Hardcoded for testing
-  });
+  const [data, setData] = useState({ senderNames: [], spamCounts: [] });
 
-  // Fetching data from Backend (commented out for now)
   useEffect(() => {
-    // Uncomment and replace with actual backend fetching logic when needed
-    // const fetchData = async () => {
-    //   try {
-    //     const response = await fetch(
-    //       "${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/messages?{group_id}",
-    //       {
-    //         method: "GET",
-    //         //credentials: "include", // Include credentials (cookies, etc.)
-    //       }
-    //     );
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_SERVER_URL}/graphs/member/spamlikebehavior?group_id=${groupId}`
+        );
+        
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
 
-    //     // Parse the JSON response
-    //     const result = await response.json();
-    //     setData(result);
-    //     console.log("Data successfully fetched from the backend:");
-    //     console.log(result); // Log the result for debugging
-    //   } catch (error) {
-    //     console.error("Error fetching data:", error.message);
-    //   }
-    // };
+        const result = await response.json();
+        
+        // Transform backend response into chart format
+        const senderNames = result.spam_like_behavior.map((entry) => entry.sender_name);
+        const spamCounts = result.spam_like_behavior.map((entry) => entry.spam_actions);
 
-    // fetchData();
+        setData({ senderNames, spamCounts });
+        console.log("Fetched data:", result);
+      } catch (error) {
+        console.error("Error fetching data:", error.message);
+      }
+    };
 
-    // Detect dark mode preference
+    fetchData();
+
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setIsDarkMode(matchMedia.matches);
 
@@ -58,15 +54,14 @@ const SpamBehaviorChart = ({
     return () => {
       matchMedia.removeEventListener("change", handleChange);
     };
-  }, []);
+  }, [groupId]);
 
-  // Chart data configuration
   const chartData = {
-    labels: data.senderNames, // Sender names as Y-axis labels
+    labels: data.senderNames,
     datasets: [
       {
-        label: "Spam Message Count", // Dataset label
-        data: data.spamCounts, // Spam message counts
+        label: "Spam Message Count",
+        data: data.spamCounts,
         backgroundColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
         borderColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
         borderWidth: 1,
@@ -80,7 +75,7 @@ const SpamBehaviorChart = ({
         <Bar
           data={chartData}
           options={{
-            indexAxis: "y", // Horizontal bar chart
+            indexAxis: "y",
             responsive: true,
             maintainAspectRatio: false,
             animation: {
@@ -89,13 +84,11 @@ const SpamBehaviorChart = ({
             },
             plugins: {
               legend: {
-                display: false, // Disable legend
+                display: false,
               },
               tooltip: {
                 callbacks: {
-                  label: (tooltipItem) => {
-                    return `Spam Messages: ${tooltipItem.raw}`; // Tooltip shows spam count
-                  },
+                  label: (tooltipItem) => `Spam Messages: ${tooltipItem.raw}`,
                 },
               },
             },
@@ -103,27 +96,26 @@ const SpamBehaviorChart = ({
               x: {
                 title: {
                   display: true,
-                  text: "No of Spam Messages", // X-axis title
+                  text: "No of Spam Messages",
                   color: "white",
                 },
                 ticks: {
-                  color: "#fff", // X-axis tick color
+                  color: "#fff",
                 },
                 beginAtZero: true,
                 grid: {
-                  color: isDarkMode
-                    ? "rgba(220, 220, 220, 0.1)"
-                    : "rgba(0, 0, 0, 0.1)",
+                  color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
                 },
               },
               y: {
                 title: {
                   display: true,
-                  text: "Sender Name", // Y-axis title
+                  text: "Sender Name",
                   color: "white",
                 },
                 ticks: {
-                  color: "#fff", // Y-axis tick color
+                  display:false,
+                  color: "#fff",
                 },
                 grid: {
                   display: false,
@@ -133,12 +125,8 @@ const SpamBehaviorChart = ({
             elements: {
               bar: {
                 borderRadius: 10,
-                backgroundColor: isDarkMode
-                  ? backgroundColorDark
-                  : backgroundColorLight,
-                hoverBackgroundColor: isDarkMode
-                  ? `${backgroundColorDark}CC`
-                  : `${backgroundColorLight}CC`,
+                backgroundColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
+                hoverBackgroundColor: isDarkMode ? `${backgroundColorDark}CC` : `${backgroundColorLight}CC`,
               },
             },
           }}
@@ -146,7 +134,7 @@ const SpamBehaviorChart = ({
       </div>
       <style jsx>{`
         .chart-container:hover .chartjs-render-monitor {
-          transform: scale(1.05); /* Scale the chart on hover */
+          transform: scale(1.05);
           transition: transform 0.3s ease;
         }
       `}</style>

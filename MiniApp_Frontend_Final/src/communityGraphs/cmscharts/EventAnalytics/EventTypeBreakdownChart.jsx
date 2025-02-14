@@ -4,42 +4,35 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const EventTypeBreakdownChart = ({ title }) => {
+const EventTypeBreakdownChart = ({ title, groupId }) => {
   const [theme, setTheme] = useState("light");
   const [selectedIndex, setSelectedIndex] = useState(null);
-  // const [eventData, setEventData] = useState({
-  //   labels: ["Q&A", "Contests", "Workshops", "Networking"], // Event types
-  //   values: [300, 120, 180, 200], // Participation counts
-  // });
-  const [eventData, setEventData] = useState({ labels: [], values: [] })
-
-  // Uncomment and configure this function for BigQuery data fetching
+  const [eventData, setEventData] = useState({ labels: [], values: [] });
 
   const fetchBigQueryData = async () => {
     try {
-      // Example: Replace with your BigQuery API endpoint or service
       const response = await fetch(
-          '${process.env.REACT_APP_SERVER_URL}/graphs/event/eventtypebreakdownchart?group_id=${group_id}',
-          {
-            method: "GET",
-            //credentials: "include", // Include credentials
-          }
-        );
+        `${process.env.REACT_APP_SERVER_URL}/graphs/event/eventtypebreakdownchart?group_id=${groupId}`
+      );
       const result = await response.json();
 
-      // Transform data into labels and values
-      const labels = result.map((row) => row.event_type);
-      const values = result.map((row) => row.participation_count);
+      if (!result || !result.rows || !Array.isArray(result.rows) || result.rows.length === 0) {
+        console.warn("No event data received.");
+        setEventData({ labels: ["No Data"], values: [1] }); // Fallback to prevent crashes
+        return;
+      }
+
+      const labels = result.rows.map((row) => row.event_type || "Unknown");
+      const values = result.rows.map((row) => row.participation_count || 0);
 
       setEventData({ labels, values });
     } catch (error) {
-      console.error("Error fetching data from BigQuery:", error);
+      console.error("Error fetching data from API:", error);
+      setEventData({ labels: ["Error"], values: [1] });
     }
   };
 
-
-  // Calculate total participation dynamically
-  const totalValue = eventData.values.reduce((acc, value) => acc + value, 0);
+  const totalValue = eventData.values.reduce((acc, value) => acc + value, 0) || 1;
 
   useEffect(() => {
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
@@ -51,21 +44,16 @@ const EventTypeBreakdownChart = ({ title }) => {
 
     matchMedia.addEventListener("change", handleThemeChange);
 
-    // Uncomment this line when ready to integrate with BigQuery
     fetchBigQueryData();
 
     return () => {
       matchMedia.removeEventListener("change", handleThemeChange);
     };
-  }, []);
+  }, [groupId]);
 
   const themeColors = ["#45e8ed", "#2db7ba", "#43aaae", "#29c7c3"];
 
-  const getColor = (value, max) => {
-    const ratio = value / max;
-    const index = Math.min(Math.floor(ratio * (themeColors.length - 1)), themeColors.length - 1);
-    return themeColors[index];
-  };
+  const getColor = (index) => themeColors[index % themeColors.length];
 
   const lightenColor = (color, amount) => {
     const num = parseInt(color.slice(1), 16);
@@ -75,8 +63,7 @@ const EventTypeBreakdownChart = ({ title }) => {
     return `#${(1 << 24 | (r << 16) | (g << 8) | b).toString(16).slice(1)}`;
   };
 
-  const maxValue = Math.max(...eventData.values);
-  const baseColors = eventData.values.map((value) => getColor(value, maxValue));
+  const baseColors = eventData.labels.map((_, i) => getColor(i));
   const hoverColors = baseColors.map((color) => lightenColor(color, 30));
 
   const chartData = {
@@ -100,9 +87,7 @@ const EventTypeBreakdownChart = ({ title }) => {
     maintainAspectRatio: false,
     cutout: "70%",
     plugins: {
-      legend: {
-        display: false,
-      },
+      legend: { display: false },
       tooltip: {
         backgroundColor: theme === "dark" ? "#333" : "#FFF",
         titleColor: theme === "dark" ? "#FFF" : "#000",
@@ -111,7 +96,7 @@ const EventTypeBreakdownChart = ({ title }) => {
         borderWidth: 1,
         callbacks: {
           label: function (context) {
-            const value = eventData.values[context.dataIndex];
+            const value = eventData.values[context.dataIndex] || 0;
             return `${context.label}: ${value.toLocaleString()} (${((value / totalValue) * 100).toFixed(2)}%)`;
           },
         },

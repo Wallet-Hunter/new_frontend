@@ -12,6 +12,7 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 const EventParticipationChart = ({
+  groupId,
   labels = [], // Labels representing event names or IDs
   data = [],   // Data representing the number of participants for each event
   isDashboard = false,
@@ -29,7 +30,7 @@ const EventParticipationChart = ({
 
       try {
         const response = await fetch(
-          '${process.env.REACT_APP_SERVER_URL}/graphs/event/eventparticipationchart?group_id=${group_id}',
+          `${process.env.REACT_APP_SERVER_URL}/graphs/event/eventparticipationchart?group_id=${groupId}`,
           {
             method: "GET",
             //credentials: "include", // Include credentials
@@ -59,7 +60,7 @@ const EventParticipationChart = ({
     };
 
     fetchData();
-  }, []);
+  }, [groupId]);
 
   const chartData = {
     labels: chartLabels,
@@ -82,7 +83,7 @@ const EventParticipationChart = ({
     return () => {
       matchMedia.removeEventListener("change", handleChange);
     };
-  }, []);
+  }, [groupId]);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>

@@ -12,21 +12,7 @@ import {
   styled,
 } from "@mui/material";
 
-// Example hardcoded data for testing purposes
-const hardcodedData = [
-  { orgId: 1, orgName: "Org A", interactionCount: 150 },
-  { orgId: 2, orgName: "Org B", interactionCount: 140 },
-  { orgId: 3, orgName: "Org C", interactionCount: 120 },
-  { orgId: 4, orgName: "Org D", interactionCount: 110 },
-  { orgId: 5, orgName: "Org E", interactionCount: 100 },
-  { orgId: 6, orgName: "Org F", interactionCount: 90 },
-  { orgId: 7, orgName: "Org G", interactionCount: 80 },
-  { orgId: 8, orgName: "Org H", interactionCount: 70 },
-  { orgId: 9, orgName: "Org I", interactionCount: 60 },
-  { orgId: 10, orgName: "Org J", interactionCount: 50 },
-];
-
-// Styled TableRow for futuristic effect
+// Styled components for futuristic effect
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   transition: "0.3s",
   backgroundColor: "#171717",
@@ -35,13 +21,12 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     backgroundColor: "rgba(255, 255, 255, 0.1)",
   },
 }));
-// Styled TableCell for white text
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  color: "white", // Default white text
-  borderBottom: "1px solid rgba(255, 255, 255, 0.1)", // Subtle border for separation
+  color: "white",
+  borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
 }));
 
-// Badges for top three ranks
 const Badge = styled("span")(({ theme }) => ({
   borderRadius: "12px",
   padding: "4px 8px",
@@ -51,26 +36,17 @@ const Badge = styled("span")(({ theme }) => ({
   marginRight: "8px",
 }));
 
-const LeadershipChart = () => {
+const LeadershipChart = ({ groupId }) => {
   const [leaderboardData, setLeaderboardData] = useState([]);
 
   useEffect(() => {
-    // Placeholder for fetching data from BigQuery
-    // Uncomment and replace with actual fetching logic
-
     const fetchLeaderboardData = async () => {
       try {
         const response = await fetch(
-          '${process.env.REACT_APP_SERVER_URL}/graphs/event/leaderboard?group_id=${group_id}',
-          {
-            method: "GET",
-            //credentials: "include", // Include credentials
-          }
+          `${process.env.REACT_APP_SERVER_URL}/graphs/event/leaderboard?group_id=${groupId}`
         );
         const data = await response.json();
-        if (data.error) {
-          // Handle error if needed
-        } else {
+        if (!data.error) {
           setLeaderboardData(data);
         }
       } catch (error) {
@@ -79,25 +55,27 @@ const LeadershipChart = () => {
     };
 
     fetchLeaderboardData();
+  }, [groupId]);
 
-    // Use hardcoded data for testing
-    // setLeaderboardData(hardcodedData);
-  }, []);
+  // Process data to match the expected format
+  const formattedData = leaderboardData.map((user) => ({
+    orgId: user.userId,
+    orgName: user.userName,
+    interactionCount: user.engagementScore,
+  }));
 
-  // Ensure data is sorted by interaction count in descending order
-  const topOrganizations = leaderboardData
+  const topOrganizations = formattedData
     .sort((a, b) => b.interactionCount - a.interactionCount)
-    .slice(0, 5); // Limit to top 5 organizations
+    .slice(0, 5);
 
-  // Custom styles for rank highlighting
   const getRowStyle = (index) => {
     switch (index) {
       case 0:
-        return { backgroundColor: "#76dde1", color: "black" }; // Gold for 1st
+        return { backgroundColor: "#76dde1", color: "black" };
       case 1:
-        return { backgroundColor: "#54d5d9", color: "black" }; // Silver for 2nd
+        return { backgroundColor: "#54d5d9", color: "black" };
       case 2:
-        return { backgroundColor: "#43aaae", color: "black" }; // Bronze for 3rd
+        return { backgroundColor: "#43aaae", color: "black" };
       default:
         return {};
     }
@@ -125,77 +103,33 @@ const LeadershipChart = () => {
           fontWeight: "bold",
         }}
       >
-        Top Organizations in Events
+        Top Users by Engagement
       </Typography>
 
-      {/* Scrollable table container */}
       <TableContainer
         component={Paper}
         elevation={0}
-        sx={{
-          borderRadius: "8px",
-          overflowY: "auto",
-          maxHeight: "300px",
-          color: "white",
-        }}
+        sx={{ borderRadius: "8px", overflowY: "auto", maxHeight: "300px" }}
       >
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell
-                sx={{
-                  backgroundColor: "#333333", // Dark background
-                  color: "white", // White text
-                  fontWeight: "bold", // Bold font for better visibility
-                }}
-              >
-                Rank
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "#333333", // Dark background
-                  color: "white", // White text
-                  fontWeight: "bold", // Bold font for better visibility
-                }}
-              >
-                Organization
-              </TableCell>
-              <TableCell
-                align="right"
-                sx={{
-                  backgroundColor: "#333333", // Dark background
-                  color: "white", // White text
-                  fontWeight: "bold", // Bold font for better visibility
-                }}
-              >
-                Interaction Count
-              </TableCell>
+              <TableCell sx={{ backgroundColor: "#333", color: "white", fontWeight: "bold" }}>Rank</TableCell>
+              <TableCell sx={{ backgroundColor: "#333", color: "white", fontWeight: "bold" }}>User</TableCell>
+              <TableCell align="right" sx={{ backgroundColor: "#333", color: "white", fontWeight: "bold" }}>Engagement Score</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {topOrganizations.map((org, index) => (
-              <StyledTableRow
-                key={org.orgId}
-                sx={{
-                  ...getRowStyle(index),
-                }}
-              >
+            {topOrganizations.map((user, index) => (
+              <StyledTableRow key={user.orgId} sx={{ ...getRowStyle(index) }}>
                 <StyledTableCell>
                   {index + 1}
-                  {index === 0 && (
-                    <Badge style={{ backgroundColor: "#76dde1" }}>🏆</Badge>
-                  )}
-                  {index === 1 && (
-                    <Badge style={{ backgroundColor: "#54d5d9" }}>🥈</Badge>
-                  )}
-                  {index === 2 && (
-                    <Badge style={{ backgroundColor: "#43aaae" }}>🥉</Badge>
-                  )}
+                  {index === 0 && <Badge style={{ backgroundColor: "#76dde1" }}>🏆</Badge>}
+                  {index === 1 && <Badge style={{ backgroundColor: "#54d5d9" }}>🥈</Badge>}
+                  {index === 2 && <Badge style={{ backgroundColor: "#43aaae" }}>🥉</Badge>}
                 </StyledTableCell>
-                <StyledTableCell>{org.orgName}</StyledTableCell>
-                <StyledTableCell align="right">
-                  {org.interactionCount}
-                </StyledTableCell>
+                <StyledTableCell>{user.orgName}</StyledTableCell>
+                <StyledTableCell align="right">{user.interactionCount}</StyledTableCell>
               </StyledTableRow>
             ))}
           </TableBody>

@@ -11,31 +11,26 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-const EventEngagementChart = () => {
-  const [theme, setTheme] = useState("light");
+const EventEngagementChart = ({ groupId }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [chartData, setChartData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Function to fetch data from BigQuery (commented out for now)
   const fetchBigQueryData = async () => {
+    setLoading(true); // Show loading state while fetching new data
     try {
       const response = await fetch(
-        '${process.env.REACT_APP_SERVER_URL}/graphs/event/eventengagementchart?group_id=${group_id}',
-        {
-          method: "GET",
-          //credentials: "include", // Include credentials
-        }
+        `${process.env.REACT_APP_SERVER_URL}/graphs/event/eventengagementchart?group_id=${groupId}`
       );
-
       const result = await response.json();
-      if(result.error){
 
-      }
-      else{
-        const eventNames = data.map((row) => row.event_name);
-        const messages = data.map((row) => row.messages);
-        const reactions = data.map((row) => row.reactions);
-        const replies = data.map((row) => row.replies);
+      if (result.error || !result.rows || result.rows.length === 0) {
+        setChartData(null); // Handle empty data case
+      } else {
+        const eventNames = result.rows.map((row) => row.event_name);
+        const messages = result.rows.map((row) => row.messages);
+        const reactions = result.rows.map((row) => row.reactions);
+        const replies = result.rows.map((row) => row.replies);
 
         setChartData({
           labels: eventNames,
@@ -64,70 +59,38 @@ const EventEngagementChart = () => {
           ],
         });
       }
-      const data = result.rows; // Adjust based on BigQuery API response structure
-
-      // Parse the fetched data
-
-
-      // Update chartData state
-
     } catch (error) {
-      console.error("Error fetching data from BigQuery:", error);
+      console.error("Error fetching data:", error);
+      setChartData(null);
     }
+    setLoading(false); // Hide loading state after fetching
   };
-
 
   useEffect(() => {
     // Detect dark mode preference
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setIsDarkMode(matchMedia.matches);
 
-    const handleChange = (e) => setIsDarkMode(e.matches);
-    matchMedia.addEventListener("change", handleChange);
-
-    // Commented out BigQuery fetch call for testing
-    fetchBigQueryData();
-
-    // Hardcoded data for testing
-    // const eventNames = ["Event A", "Event B", "Event C", "Event D"];
-    // const messages = [200, 150, 300, 250];
-    // const reactions = [350, 400, 450, 500];
-    // const replies = [100, 120, 90, 150];
-
-    // setChartData({
-    //   labels: eventNames,
-    //   datasets: [
-    //     {
-    //       label: "Messages",
-    //       data: messages,
-    //       backgroundColor: isDarkMode ? "#225557" : "#54d5d9",
-    //       borderColor: isDarkMode ? "#225557" : "#54d5d9",
-    //       borderWidth: 1,
-    //     },
-    //     {
-    //       label: "Reactions",
-    //       data: reactions,
-    //       backgroundColor: isDarkMode ? "#54d5d9" : "#43aaae",
-    //       borderColor: isDarkMode ? "#54d5d9" : "#43aaae",
-    //       borderWidth: 1,
-    //     },
-    //     {
-    //       label: "Replies",
-    //       data: replies,
-    //       backgroundColor: isDarkMode ? "#43aaae" : "#225557",
-    //       borderColor: isDarkMode ? "#43aaae" : "#225557",
-    //       borderWidth: 1,
-    //     },
-    //   ],
-    // });
+    const handleThemeChange = (e) => setIsDarkMode(e.matches);
+    matchMedia.addEventListener("change", handleThemeChange);
 
     return () => {
-      matchMedia.removeEventListener("change", handleChange);
+      matchMedia.removeEventListener("change", handleThemeChange);
     };
   }, []);
 
-  if (!chartData) {
+  useEffect(() => {
+    if (groupId) {
+      fetchBigQueryData();
+    }
+  }, [groupId]); // Fetch data whenever groupId changes
+
+  if (loading) {
     return <div>Loading chart data...</div>;
+  }
+
+  if (!chartData) {
+    return <div>No engagement data available</div>;
   }
 
   return (
@@ -144,49 +107,42 @@ const EventEngagementChart = () => {
             },
             plugins: {
               legend: {
-                display:false,
-                //position: "top",
+                display: false,
               },
               tooltip: {
                 callbacks: {
-                  label: (tooltipItem) => {
-                    return `${tooltipItem.dataset.label}: ${tooltipItem.raw}`;
-                  },
+                  label: (tooltipItem) => `${tooltipItem.dataset.label}: ${tooltipItem.raw}`,
                 },
               },
             },
             scales: {
               x: {
-                stacked: true, // Enable stacking
+                stacked: true,
                 title: {
                   display: true,
                   text: "Events",
-                  color:"white"
+                  color: "white",
                 },
-                ticks:{
-                  color:"white"
+                ticks: {
+                  color: "white",
                 },
                 grid: {
-                  color: isDarkMode
-                    ? "rgba(220, 220, 220, 0.1)"
-                    : "rgba(0, 0, 0, 0.1)",
+                  color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
                 },
               },
               y: {
-                stacked: true, // Enable stacking
+                stacked: true,
                 title: {
                   display: true,
                   text: "Average Engagement",
-                  color:"white"
+                  color: "white",
                 },
-                ticks:{
-                  color:"white"
+                ticks: {
+                  color: "white",
                 },
                 beginAtZero: true,
                 grid: {
-                  color: isDarkMode
-                    ? "rgba(220, 220, 220, 0.1)"
-                    : "rgba(0, 0, 0, 0.1)",
+                  color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
                 },
               },
             },

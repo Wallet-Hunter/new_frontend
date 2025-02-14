@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import styled from "styled-components";
 
-const EngagementDropsChart = () => {
+const EngagementDropsChart = ({groupId}) => {
   const [theme, setTheme] = useState("light");
   const [chartData, setChartData] = useState([]);
 
@@ -17,34 +17,21 @@ const EngagementDropsChart = () => {
 
     matchMedia.addEventListener("change", handleThemeChange);
 
-    // Fetch data from Backend
+    // Fetch data from Backend API
     const fetchData = async () => {
       try {
-        // Uncomment this block when ready to use backend logic
-        /*
-        const response = await fetch(
-          "${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/messages?{group_id}",
-          {
-            method: "GET",
-            //credentials: "include", // Include credentials (cookies, etc.)
-          }
-        );
-
-        // Parse the JSON response
+        const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/graphs/member/engagementdrops?group_id=${groupId}`);
         const result = await response.json();
-        setChartData(result);
-        console.log("Data successfully fetched from the backend:", result);
-        */
 
-        // Hardcoded Data for Testing
-        const testData = [
-          { time: "Day 1", engagement: 150 },
-          { time: "Day 2", engagement: 120 },
-          { time: "Day 3", engagement: 100 },
-          { time: "Day 4", engagement: 80 },
-          { time: "Day 5", engagement: 60 },
-        ];
-        setChartData(testData);
+        if (result.engagement_drops) {
+          const formattedData = result.engagement_drops.map((entry) => ({
+            time: entry.date.value, // Convert date to a readable format if needed
+            engagement: entry.avg_engagement,
+          }));
+
+          setChartData(formattedData);
+          console.log("Data successfully fetched from the backend:", formattedData);
+        }
       } catch (error) {
         console.error("Error fetching data:", error.message);
       }
@@ -55,7 +42,7 @@ const EngagementDropsChart = () => {
     return () => {
       matchMedia.removeEventListener("change", handleThemeChange);
     };
-  }, []);
+  }, [groupId]);
 
   return (
     <ChartContainer className={theme}>
@@ -65,7 +52,7 @@ const EngagementDropsChart = () => {
           <XAxis
             dataKey="time"
             label={{
-              value: "Time (Days)",
+              value: "Date",
               position: "insideBottomRight",
               style: { fill: "white", fontSize: "12px" },
               offset: -5,
@@ -116,14 +103,14 @@ const ChartContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: "black";
+  background-color: transparent;
 
   &.light {
     --line-color: #54d5d9;
     --axis-color: #333333;
     --grid-color: rgba(0, 0, 0, 0.1);
     --tooltip-bg: #f0f0f0;
-    --tooltip-color: #f0f0f0;
+    --tooltip-color: #333333;
     --tooltip-cursor-color: rgba(0, 0, 0, 0.2);
   }
 

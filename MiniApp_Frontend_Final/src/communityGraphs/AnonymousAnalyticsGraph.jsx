@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from "react";
 import { Box, Card, CardContent, Typography } from "@mui/material";
-import { csv } from "d3-fetch";
 
 // Import your individual graph components
 
@@ -13,22 +11,8 @@ import AnonymousFeedbackChart from "./cmscharts/Anonymous/AnonymousFeedbackChart
 import AnonymousPostTrend from "./cmscharts/Anonymous/AnonymousPostTrend";
 import SentimentDoughnutChart from "./cmscharts/Anonymous/SentimentDoughnutChart";
 import AnonymousEngagementChart from "./cmscharts/Anonymous/AnonymousEngagementChart";
-import GroupCultureChart from "./cmscharts/Anonymous/GroupCultureChart";
 
 const AnonymousAnalyticsGraph = ({ groupId }) => {
-  const [lineChartData, setLineChartData] = useState([]);
-
-  const fetchData = async (file, setData) => {
-    try {
-      const data = await csv(file);
-      setData(data);
-    } catch (error) {
-      console.error(`Error fetching ${file}:`, error);
-    }
-  };
-
-  
-
   return (
     <Box
       sx={{
@@ -48,7 +32,7 @@ const AnonymousAnalyticsGraph = ({ groupId }) => {
           }}
         >
           <CardContent>
-            <Leaderboard groupId={groupId}/>
+            <Leaderboard groupId={groupId} />
           </CardContent>
         </Card>
       </Box>
@@ -98,7 +82,7 @@ const AnonymousAnalyticsGraph = ({ groupId }) => {
                 width: "90%",
               }}
             >
-              <TotalAnonymousMessagesNumberCard  groupId = {groupId}/>
+              <TotalAnonymousMessagesNumberCard groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -138,7 +122,7 @@ const AnonymousAnalyticsGraph = ({ groupId }) => {
                 width: "90%",
               }}
             >
-              <AnonymousUserInteractionChart groupId = {groupId} />
+              <AnonymousUserInteractionChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -178,7 +162,7 @@ const AnonymousAnalyticsGraph = ({ groupId }) => {
                 width: "90%",
               }}
             >
-              <AnonymousFeedbackChart groupId = {groupId}/>
+              <AnonymousFeedbackChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -218,50 +202,10 @@ const AnonymousAnalyticsGraph = ({ groupId }) => {
                 width: "90%",
               }}
             >
-              <AnonymousPostTrend groupId = {groupId}/>
+              <AnonymousPostTrend groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
-
-        {/*Anonymous Polls/Surveys*/}
-        {/* <Card
-            sx={{
-              padding: 2,
-              height: "200px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "#171717",
-              transition: "box-shadow 0.3s ease-in-out",
-              "&:hover": { boxShadow: `0px 4px 20px 0px #54d5d9` },
-            }}
-          >
-            <CardContent
-              sx={{
-                textAlign: "center",
-                padding: "8px",
-                width: "100%",
-                height: "100%",
-                color: "white",
-              }}
-            >
-              <Typography variant="h6" gutterBottom>
-                Anonymous Polls/Surveys
-              </Typography>
-              <Box
-                sx={{
-                  flexGrow: 1,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "95%",
-                  width: "90%",
-                }}
-              >
-                <PollParticipationChart />
-              </Box>
-            </CardContent>
-          </Card> */}
 
         {/*Impact of Anonymous Participation*/}
         <Card
@@ -298,50 +242,10 @@ const AnonymousAnalyticsGraph = ({ groupId }) => {
                 width: "90%",
               }}
             >
-              <ImpactOfAnonymousParticipation groupId = {groupId} />
+              <ImpactOfAnonymousParticipation groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
-
-        {/*Member Trust via Anonymity*/}
-        {/* <Card
-            sx={{
-              padding: 2,
-              height: "200px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "#171717",
-              transition: "box-shadow 0.3s ease-in-out",
-              "&:hover": { boxShadow: `0px 4px 20px 0px #54d5d9` },
-            }}
-          >
-            <CardContent
-              sx={{
-                textAlign: "center",
-                padding: "8px",
-                width: "100%",
-                height: "100%",
-                color: "white",
-              }}
-            >
-              <Typography variant="h6" gutterBottom>
-                Member Trust via Anonymity
-              </Typography>
-              <Box
-                sx={{
-                  flexGrow: 1,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "95%",
-                  width: "90%",
-                }}
-              >
-                <MemberTrustHistogram />
-              </Box>
-            </CardContent>
-          </Card> */}
 
         {/*Sentiment in Anonymous Messages*/}
         <Card
@@ -378,7 +282,7 @@ const AnonymousAnalyticsGraph = ({ groupId }) => {
                 width: "90%",
               }}
             >
-              <SentimentDoughnutChart groupId = {groupId}/>
+              <SentimentDoughnutChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -418,7 +322,7 @@ const AnonymousAnalyticsGraph = ({ groupId }) => {
                 width: "90%",
               }}
             >
-              <DiscussionsChart groupId = {groupId}/>
+              <DiscussionsChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -458,7 +362,7 @@ const AnonymousAnalyticsGraph = ({ groupId }) => {
                 width: "90%",
               }}
             >
-              <AnonymousEngagementChart groupId = {groupId} />
+              <AnonymousEngagementChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>

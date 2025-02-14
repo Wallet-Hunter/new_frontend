@@ -10,7 +10,7 @@ import {
 } from 'recharts';
 import styled from 'styled-components';
 
-const EventImpactChart = () => {
+const EventImpactChart = ({groupId}) => {
   const [theme, setTheme] = useState("light");
   const [data, setData] = useState([]); // State to store fetched data
 
@@ -44,7 +44,7 @@ const EventImpactChart = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          '${process.env.REACT_APP_SERVER_URL}/graphs/event/eventimpactchart?group_id=${group_id}',
+          `${process.env.REACT_APP_SERVER_URL}/graphs/event/eventimpactchart?group_id=${groupId}`,
           {
             method: "GET",
             //credentials: "include", // Include credentials
@@ -68,7 +68,7 @@ const EventImpactChart = () => {
     return () => {
       matchMedia.removeEventListener("change", handleThemeChange);
     };
-  }, []);
+  }, [groupId]);
 
   return (
     <ChartContainer className={theme}>

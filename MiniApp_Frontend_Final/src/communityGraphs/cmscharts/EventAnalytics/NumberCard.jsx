@@ -22,14 +22,14 @@ const NumberCard = ({ title, number }) => {
         <Typography
           variant="h6"
           component="div"
-          sx={{ fontSize: { xs: '1rem', sm: '1.2rem' },color:"white", fontWeight: 'bold' }} // Responsive font size
+          sx={{ fontSize: { xs: '1rem', sm: '1.2rem' }, color: "white", fontWeight: 'bold' }} // Responsive font size
         >
           {title}
         </Typography>
         <Typography
           variant="h4"
           component="div"
-          sx={{ fontWeight: 'bold',color:"white", fontSize: { xs: '2rem', sm: '3rem' } }} // Responsive font size
+          sx={{ fontWeight: 'bold', color: "white", fontSize: { xs: '2rem', sm: '3rem' } }} // Responsive font size
         >
           {number}
         </Typography>
@@ -38,29 +38,28 @@ const NumberCard = ({ title, number }) => {
   );
 };
 
-const TotalEventsCard = () => {
+const TotalEventsCard = ({ groupId }) => {
   const [totalEvents, setTotalEvents] = useState(0);
 
   useEffect(() => {
     const fetchTotalEvents = async () => {
       try {
         const response = await fetch(
-          '${process.env.REACT_APP_SERVER_URL}/graphs/event/numbercard?group_id=${group_id}',
-          {
-            method: "GET",
-            //credentials: "include", // Include credentials
-          }
+          `${process.env.REACT_APP_SERVER_URL}/graphs/event/numbercard?group_id=${groupId}`
         );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
         const data = await response.json();
 
-        if (data.error) {
-          console.error('Error from API:', data.error);
-          setTotalEvents(0); // Set default value if there's an error
-        } else if (data.data.length === 0) {
-          setTotalEvents(0); // No data case
+        // Ensure data is fetched correctly and is a number
+        if (typeof data.data === 'number') {
+          setTotalEvents(data.data);
         } else {
-          setTotalEvents(data.data); // Set the fetched data
+          console.error('Unexpected API response format:', data);
+          setTotalEvents(0);
         }
       } catch (error) {
         console.error('Error fetching data from API:', error);
@@ -69,11 +68,11 @@ const TotalEventsCard = () => {
     };
 
     fetchTotalEvents();
-  }, []);
+  }, [groupId]);
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-      <NumberCard title="Total Events Held" number={totalEvents} />
+      <NumberCard  number={totalEvents} />
     </Box>
   );
 };

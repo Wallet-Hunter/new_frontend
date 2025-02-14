@@ -23,22 +23,8 @@ import EventContentPerformance from "./cmscharts/EventAnalytics/EventContentPerf
 
 //import { color } from "d3";
 
-const EventAnalyticsGraph = ({ lineChartCsvFile }) => {
-  const [lineChartData, setLineChartData] = useState([]);
+const EventAnalyticsGraph = ({ groupId }) => {
   //const isSmallScreen = useMediaQuery("(max-width: 900px)"); // Detect small screens
-
-  const fetchData = async (file, setData) => {
-    try {
-      const data = await csv(file);
-      setData(data);
-    } catch (error) {
-      console.error(`Error fetching ${file}:`, error);
-    }
-  };
-
-  useEffect(() => {
-    fetchData(lineChartCsvFile, setLineChartData);
-  }, [lineChartCsvFile]);
 
   return (
     <Box
@@ -51,9 +37,7 @@ const EventAnalyticsGraph = ({ lineChartCsvFile }) => {
     >
       {/* Right Side - Leaderboard */}
       {/*Top Contributors in Events*/}
-      <Box
-        sx={{ width: { xs: "100%", lg: "40%" } }}
-      >
+      <Box sx={{ width: { xs: "100%", lg: "40%" } }}>
         <Card
           sx={{
             height: "50%",
@@ -63,12 +47,11 @@ const EventAnalyticsGraph = ({ lineChartCsvFile }) => {
           }}
         >
           <CardContent>
-            <Leaderboard />
+            <Leaderboard groupId={groupId} />
           </CardContent>
         </Card>
       </Box>
       {/* Left Side - Charts */}
-
 
       {/* Grid for Other Charts */}
       <Box
@@ -87,7 +70,7 @@ const EventAnalyticsGraph = ({ lineChartCsvFile }) => {
             transition: "box-shadow 0.3s",
             "&:hover": { boxShadow: "0px 4px 20px #54d5d9" },
             backgroundColor: "#171717",
-            padding: 2
+            padding: 2,
           }}
         >
           <CardContent sx={{ ...CardContentStyles }}>
@@ -100,7 +83,7 @@ const EventAnalyticsGraph = ({ lineChartCsvFile }) => {
                 alignItems: "center",
               }}
             >
-              <NumberCard totalEvents={120} />
+              <NumberCard groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -110,10 +93,7 @@ const EventAnalyticsGraph = ({ lineChartCsvFile }) => {
           <CardContent sx={{ ...CardContentStyles }}>
             <Typography variant="h6">Event Participation</Typography>
             <Box sx={chartBoxStyles}>
-              <EventParticipationChart
-                labels={["Event A", "Event B", "Event C", "Event D"]}
-                data={[150, 230, 120, 300]}
-              />
+              <EventParticipationChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -133,35 +113,27 @@ const EventAnalyticsGraph = ({ lineChartCsvFile }) => {
           <CardContent sx={{ ...CardContentStyles }}>
             <Typography variant="h6">Event Engagement</Typography>
             <Box sx={chartBoxStyles}>
-              <EventEngagementChart
-                labels={["Event 1", "Event 2", "Event 3"]}
-                data={[100, 200, 150]}
-              />
+              <EventEngagementChart groupId={groupId} />
             </Box>
           </CardContent>
-
         </Card>
 
-
         {/*Event Timing*/}
-        <Card sx={{ ...chartCardStyles }}>
+        {/* <Card sx={{ ...chartCardStyles }}>
           <CardContent sx={{ ...CardContentStyles }}>
             <Typography variant="h6">Event Timing</Typography>
             <Box sx={chartBoxStyles}>
-              <EventTimingChart data={lineChartData} />
+              <EventTimingChart groupId = {groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Event Popularity*/}
         <Card sx={{ ...chartCardStyles }}>
           <CardContent sx={{ ...CardContentStyles }}>
             <Typography variant="h6">Events Popularity</Typography>
             <Box sx={chartBoxStyles}>
-              <EventPopularityChart
-                labels={["Event 1", "Event 2", "Event 3"]}
-                data={[50, 70, 40]}
-              />
+              <EventPopularityChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -181,20 +153,17 @@ const EventAnalyticsGraph = ({ lineChartCsvFile }) => {
           <CardContent sx={{ ...CardContentStyles }}>
             <Typography variant="h6">Event Conversion</Typography>
             <Box sx={chartBoxStyles}>
-              <EventConversionRatesChart
-                labels={["Event 1", "Event 2", "Event 3"]}
-                data={[100, 200, 150]}
-              />
+              <EventConversionRatesChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
 
-       {/* Event Feedback*/}
+        {/* Event Feedback*/}
         <Card sx={{ ...chartCardStyles }}>
           <CardContent sx={{ ...CardContentStyles }}>
             <Typography variant="h6">Event Feedback</Typography>
             <Box sx={chartBoxStyles}>
-              <EventFeedbackChart data={lineChartData} />
+              <EventFeedbackChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -204,7 +173,7 @@ const EventAnalyticsGraph = ({ lineChartCsvFile }) => {
           <CardContent sx={{ ...CardContentStyles }}>
             <Typography variant="h6">Event Impact on Growth</Typography>
             <Box sx={chartBoxStyles}>
-              <EventImpactChart data={lineChartData} />
+              <EventImpactChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -227,7 +196,7 @@ const EventAnalyticsGraph = ({ lineChartCsvFile }) => {
           <CardContent sx={{ ...CardContentStyles }}>
             <Typography variant="h6">Event Content Performance</Typography>
             <Box sx={{ ...chartBoxStyles }}>
-              <EventContentPerformance />
+              <EventContentPerformance groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
@@ -254,12 +223,11 @@ const EventAnalyticsGraph = ({ lineChartCsvFile }) => {
           <CardContent sx={{ ...CardContentStyles }}>
             <Typography variant="h6">Follow-up Engagement</Typography>
             <Box sx={{ ...chartBoxStyles }}>
-              <FollowupEngagementChart data={lineChartData} />
+              <FollowupEngagementChart groupId={groupId} />
             </Box>
           </CardContent>
         </Card>
       </Box>
-
     </Box>
   );
 };

@@ -1,65 +1,53 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, Typography } from "@mui/material";
 
-const TotalMemberNumberCard = () => {
-  const [data, setData] = useState(null);
-
-  // Fetch data from Backend
-  // const fetchData = async () => {
-  //   try {
-  //     const response = await fetch(
-  //       '${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/messages?{group_id}',
-  //       {
-  //         method: "GET",
-  //         //credentials: "include", // Include credentials (cookies, etc.)
-  //       }
-  //     );
-  //     // Parse the JSON response
-  //     const result = await response.json();
-  //     setData(result);
-  //     console.log("Data successfully fetched from the backend:");
-  //     console.log(result); // Log the result for debugging
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error.message);
-  //   }
-  // };
+const TotalMemberNumberCard = ({ groupId }) => {
+  const [data, setData] = useState({ title: "Total Members", number: 0 });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Currently using hardcoded data for testing
-    const hardcodedData = {
-      title: "Total Members",
-      number: 150, // Example of a number fetched from BigQuery or API
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_SERVER_URL}/graphs/member/totalmember?group_id=${groupId}`
+        );
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        setData({ title: result.title || "Total Members", number: result.number ?? 0 });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
     };
+    
+    if (groupId) {
+      fetchData();
+    }
+  }, [groupId]);
 
-    setData(hardcodedData);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
-    // Uncomment the below line to fetch data dynamically from the backend
-    // fetchData();
-  }, []);
-
-  if (!data) {
-    return <div>Loading...</div>; // Show loading state while data is being fetched
+  if (error) {
+    return <div>Error: {error}</div>;
   }
 
   return (
-    <Card
-      sx={{
-        minWidth: 275,
-        padding: 2,
-        backgroundColor: "#171717",
-        color: "green.500",
-      }}
-    >
+    <Card sx={{ minWidth: 275, padding: 2, backgroundColor: "#171717", color: "white" }}>
       <CardContent>
-        <Typography variant="h6" color="white" component="div">
-          {data.title} {/* Title fetched dynamically */}
+        <Typography variant="h6" component="div">
+          {data.title}
         </Typography>
-        <Typography
-          variant="h4"
-          component="div"
-          sx={{ fontWeight: "bold", color: "white" }}
-        >
-          {data.number} {/* Number fetched dynamically */}
+        <Typography variant="h4" component="div" sx={{ fontWeight: "bold" }}>
+          {data.number}
         </Typography>
       </CardContent>
     </Card>

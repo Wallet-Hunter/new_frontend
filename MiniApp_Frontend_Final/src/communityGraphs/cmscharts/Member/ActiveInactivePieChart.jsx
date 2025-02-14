@@ -4,16 +4,10 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const ActiveInactivePieChart = ({ title }) => {
+const ActiveInactivePieChart = ({ title, groupId }) => {
   const [theme, setTheme] = useState("light");
-  const [selectedIndex, setSelectedIndex] = useState(null);
-  const [data, setData] = useState({
-    labels: ["Active Members", "Inactive Members"],
-    values: [90, 150], // Hardcoded for testing; replace with dynamic data
-  });
-
-  // Dynamically calculate the total
-  const totalValue = data.values.reduce((acc, value) => acc + value, 0);
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState({ labels: [], values: [] });
 
   useEffect(() => {
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
@@ -25,27 +19,27 @@ const ActiveInactivePieChart = ({ title }) => {
 
     matchMedia.addEventListener("change", handleThemeChange);
 
-    // Placeholder for BigQuery or API integration
-    console.log("Use effect triggered in ActiveInactivePieChart");
-
-    // Fetch data from Backend
     const fetchData = async () => {
       try {
-        const response = await fetch('${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/messages?group_id=${group_id}', {
-          method: "GET",
-          //credentials: "include", // Include credentials (cookies, etc.)
-        });
-
-        // Parse the JSON response
+        const response = await fetch(
+          `${process.env.REACT_APP_SERVER_URL}/graphs/member/activevsinactive?group_id=${groupId}`
+        );
+        
         const result = await response.json();
-
-        // Uncomment the below line to set data from the backend
-        // setData(result);
-
-        console.log("Data successfully fetched from the backend:");
-        console.log(result); // Log the result for debugging
+        
+        if (result.active_vs_inactive) {
+          const active = result.active_vs_inactive.active_count || 0;
+          const inactive = result.active_vs_inactive.inactive_count || 0;
+          
+          setData({
+            labels: ["Active Members", "Inactive Members"],
+            values: [active, inactive],
+          });
+        }
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error.message);
+        setLoading(false);
       }
     };
 
@@ -54,38 +48,18 @@ const ActiveInactivePieChart = ({ title }) => {
     return () => {
       matchMedia.removeEventListener("change", handleThemeChange);
     };
-  }, []);
+  }, [groupId]);
 
-  const themeColors = ["#45e8ed", "#2db7ba"]; // Green for active, red for inactive
-
-  const getColor = (value, max) => {
-    const ratio = value / max;
-    const index = Math.min(Math.floor(ratio * (themeColors.length - 1)), themeColors.length - 1);
-    return themeColors[index];
-  };
-
-  const lightenColor = (color, amount) => {
-    const num = parseInt(color.slice(1), 16);
-    const r = Math.min(255, (num >> 16) + amount);
-    const g = Math.min(255, ((num >> 8) & 0x00FF) + amount);
-    const b = Math.min(255, (num & 0x0000FF) + amount);
-    return `#${(1 << 24 | (r << 16) | (g << 8) | b).toString(16).slice(1)}`;
-  };
-
-  const maxValue = Math.max(...data.values);
-  const baseColors = data.values.map(value => getColor(value, maxValue));
-  const hoverColors = baseColors.map(color => lightenColor(color, 30));
+  const totalValue = data.values.reduce((acc, value) => acc + value, 0);
 
   const chartData = {
     labels: data.labels,
     datasets: [
       {
         data: data.values,
-        backgroundColor: selectedIndex === null
-          ? baseColors
-          : baseColors.map((color, i) => (i === selectedIndex ? color : "rgba(0, 0, 0, 0.1)")),
-        hoverBackgroundColor: hoverColors,
-        borderColor: baseColors.map(color => `${color}AA`),
+        backgroundColor: ["#45e8ed", "#2db7ba"],
+        hoverBackgroundColor: ["#37c5c9", "#2499a3"],
+        borderColor: ["#45e8edAA", "#2db7baAA"],
         borderWidth: 2,
         hoverOffset: 6,
       },
@@ -95,10 +69,10 @@ const ActiveInactivePieChart = ({ title }) => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    cutout: "70%", // Hollow center for doughnut effect
+    cutout: "70%",
     plugins: {
       legend: {
-        display: false, // Hide legend for a cleaner look
+        display: false,
       },
       tooltip: {
         backgroundColor: theme === "dark" ? "#333" : "#FFF",
@@ -108,85 +82,30 @@ const ActiveInactivePieChart = ({ title }) => {
         borderWidth: 1,
         callbacks: {
           label: function (context) {
-            const value = data.values[context.dataIndex];
-            return `${context.label}: ${value.toLocaleString()} (${((value / totalValue) * 100).toFixed(2)}%)`;
+            const value = data.values[context.dataIndex] || 0;
+            return `${context.label}: ${value.toLocaleString()} (${totalValue ? ((value / totalValue) * 100).toFixed(2) : 0}%)`;
           },
         },
       },
     },
-    onClick: (event, elements) => {
-      if (elements.length > 0) {
-        const index = elements[0].index;
-        setSelectedIndex(selectedIndex === index ? null : index);
-      } else {
-        setSelectedIndex(null);
-      }
-    },
-    hover: {
-      mode: 'nearest',
-      intersect: true,
-    },
   };
 
   return (
-    <div style={chartContainerStyle}>
-      {title && <h2 style={titleStyle}>{title}</h2>} {/* Conditionally display title */}
-      <div style={{ position: 'relative', width: '100%', height: '90%' }}>
-        <Doughnut data={chartData} options={options} />
-        <div style={detailsStyle}>
-          {selectedIndex !== null ? (
-            <>
-              <div style={{ ...titleStyle, fontSize: '14px', fontWeight: '600' }}>
-                {data.labels[selectedIndex]}
-              </div>
-              <div style={{ ...valueStyle, fontSize: '18px', fontWeight: '500' }}>
-                {`${data.values[selectedIndex].toLocaleString()} (${((data.values[selectedIndex] / totalValue) * 100).toFixed(2)}%)`}
-              </div>
-            </>
-          ) : (
-            <>
-              <div style={{ ...titleStyle, fontSize: '14px', fontWeight: '600' }}>Total</div>
-              <div style={{ ...valueStyle, fontSize: '18px', fontWeight: '500' }}>
-                {`${totalValue.toLocaleString()}`}
-              </div>
-            </>
-          )}
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%", height: "100%" }}>
+      {title && <h2 style={{ fontSize: "14px", fontWeight: "500", textAlign: "center" }}>{title}</h2>}
+      <div style={{ position: "relative", width: "100%", height: "90%" }}>
+        {loading ? (
+          <p style={{ textAlign: "center", fontSize: "16px", fontWeight: "500" }}>Loading...</p>
+        ) : (
+          <Doughnut data={chartData} options={options} />
+        )}
+        <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", textAlign: "center", zIndex: 10 }}>
+          <div style={{ fontSize: "14px", fontWeight: "600" }}>Total Members</div>
+          <div style={{ fontSize: "18px", fontWeight: "500" }}>{totalValue.toLocaleString()}</div>
         </div>
       </div>
     </div>
   );
-};
-
-// Styles for the chart container and tooltip
-const chartContainerStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: '100%',
-  height: '100%',
-  position: 'relative',
-};
-
-const detailsStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  textAlign: 'center',
-  zIndex: 10,
-  pointerEvents: 'none',
-};
-
-const titleStyle = {
-  fontSize: '12px',
-  fontWeight: '500',
-  textAlign: 'center',
-};
-
-const valueStyle = {
-  fontSize: '18px',
-  fontWeight: '500',
 };
 
 export default ActiveInactivePieChart;

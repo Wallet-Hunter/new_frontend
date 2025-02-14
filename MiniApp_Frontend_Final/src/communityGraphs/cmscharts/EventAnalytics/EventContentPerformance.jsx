@@ -11,7 +11,8 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-const EventContentPerformance = () => {
+const EventContentPerformance = ({groupId}) => {
+  
   const [theme, setTheme] = useState("light");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [chartData, setChartData] = useState(null);
@@ -21,7 +22,7 @@ const EventContentPerformance = () => {
     const fetchChartData = async () => {
       try {
         const response = await fetch(
-          '${process.env.REACT_APP_SERVER_URL}/graphs/event/eventcontentperformance?group_id=${group_id}',
+          `${process.env.REACT_APP_SERVER_URL}/graphs/event/eventcontentperformance?group_id=${groupId}`,
           {
             method: "GET",
             //credentials: "include", // Include credentials
@@ -84,7 +85,7 @@ const EventContentPerformance = () => {
         },
       ],
     });
-  }, [isDarkMode]);
+  }, [isDarkMode,groupId]);
 
   useEffect(() => {
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");

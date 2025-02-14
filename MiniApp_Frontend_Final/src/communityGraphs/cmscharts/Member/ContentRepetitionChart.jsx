@@ -11,14 +11,14 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-const ContentRepetitionChart = () => {
+const ContentRepetitionChart = ({ groupId }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [chartData, setChartData] = useState({
-    labels: [], // X-axis: Sender Names
+    labels: [],
     datasets: [
       {
         label: "Repeated Content Count",
-        data: [], // Y-axis: Repeated Content Counts
+        data: [],
         backgroundColor: "rgba(75, 192, 192, 1)",
         borderColor: "rgba(75, 192, 192, 1)",
         borderWidth: 1,
@@ -26,40 +26,25 @@ const ContentRepetitionChart = () => {
     ],
   });
 
-  // Fetch data from Backend
   const fetchData = async () => {
     try {
       const response = await fetch(
-        '${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/messages?group_id=${group_id}',
-        {
-          method: "GET",
-          //credentials: "include", // Include credentials (cookies, etc.)
-        }
+        `${process.env.REACT_APP_SERVER_URL}/graphs/member/contentrepetition?group_id=${groupId}`
       );
-
-      // Parse the JSON response
       const result = await response.json();
-      // Uncomment below to set the data when needed
-      // setData(result);
-      console.log("Data successfully fetched from the backend:");
-      console.log(result); // Log the result for debugging
-    } catch (error) {
-      console.error("Error fetching data:", error.message);
-    }
-  };
-
-  const fetchDataFromBigQuery = async () => {
-    try {
-      // Hardcoded data for testing
-      const hardcodedData = [
-        { senderName: "User1", repetitionCount: 30 },
-        { senderName: "User2", repetitionCount: 45 },
-        { senderName: "User3", repetitionCount: 20 },
-        { senderName: "User4", repetitionCount: 60 },
-      ];
-
-      const senderNames = hardcodedData.map((item) => item.senderName);
-      const repeatedCounts = hardcodedData.map((item) => item.repetitionCount);
+      
+      // Extract relevant data
+      const senderData = {};
+      result.content_repetition.forEach((item) => {
+        if (senderData[item.sender_name]) {
+          senderData[item.sender_name] += item.repeated_posts;
+        } else {
+          senderData[item.sender_name] = item.repeated_posts;
+        }
+      });
+      
+      const senderNames = Object.keys(senderData);
+      const repeatedCounts = Object.values(senderData);
 
       setChartData({
         labels: senderNames,
@@ -78,27 +63,23 @@ const ContentRepetitionChart = () => {
         ],
       });
     } catch (error) {
-      console.error("Error fetching data from BigQuery:", error);
+      console.error("Error fetching data:", error.message);
     }
   };
 
   useEffect(() => {
-    // Detect dark mode preference
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setIsDarkMode(matchMedia.matches);
 
     const handleChange = (e) => setIsDarkMode(e.matches);
     matchMedia.addEventListener("change", handleChange);
 
-    // Fetch chart data
-    fetchDataFromBigQuery();
-    // Uncomment below to use the backend fetching logic
-    // fetchData();
+    fetchData();
 
     return () => {
       matchMedia.removeEventListener("change", handleChange);
     };
-  }, [isDarkMode]);
+  }, [groupId]);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
@@ -114,13 +95,11 @@ const ContentRepetitionChart = () => {
             },
             plugins: {
               legend: {
-                display: false, // Hide legend
+                display: false,
               },
               tooltip: {
                 callbacks: {
-                  label: (tooltipItem) => {
-                    return `Repetitions: ${tooltipItem.raw}`;
-                  },
+                  label: (tooltipItem) => `Repetitions: ${tooltipItem.raw}`,
                 },
               },
             },
@@ -132,7 +111,7 @@ const ContentRepetitionChart = () => {
                   color: "white",
                 },
                 ticks: {
-                  color: "#fff", // X-axis tick color
+                  color: "#fff",
                 },
                 grid: {
                   display: false,
@@ -145,25 +124,17 @@ const ContentRepetitionChart = () => {
                   color: "white",
                 },
                 ticks: {
-                  color: "#fff", // Y-axis tick color
+                  color: "#fff",
                 },
                 beginAtZero: true,
                 grid: {
-                  color: isDarkMode
-                    ? "rgba(220, 220, 220, 0.1)"
-                    : "rgba(0, 0, 0, 0.1)",
+                  color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
                 },
               },
             },
           }}
         />
       </div>
-      <style jsx>{`
-        .chart-container:hover .chartjs-render-monitor {
-          transform: scale(1.05);
-          transition: transform 0.3s ease;
-        }
-      `}</style>
     </div>
   );
 };
