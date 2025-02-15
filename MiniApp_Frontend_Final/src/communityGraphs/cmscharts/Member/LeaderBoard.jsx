@@ -37,16 +37,12 @@ const Badge = styled("span")(({ theme }) => ({
   marginLeft: "8px",
 }));
 
-const TopKOLLeaderboard = () => {
+const TopKOLLeaderboard = ({groupId}) => {
   const [kolData, setKOLData] = useState([]);
 
   // Placeholder: Hardcoded data for testing
   const hardcodedData = [
-    { userId: 1, userName: "Alice", influenceScore: 85 },
-    { userId: 2, userName: "Bob", influenceScore: 80 },
-    { userId: 3, userName: "Charlie", influenceScore: 75 },
-    { userId: 4, userName: "David", influenceScore: 70 },
-    { userId: 5, userName: "Eve", influenceScore: 65 },
+    
   ];
 
   useEffect(() => {
@@ -54,7 +50,7 @@ const TopKOLLeaderboard = () => {
     const fetchKOLData = async () => {
       try {
         const response = await fetch(
-          '${process.env.REACT_APP_SERVER_URL}/graphs/member/leaderboard?group_id=${group_id}',
+          `${process.env.REACT_APP_SERVER_URL}/graphs/member/leaderboard?group_id=${groupId}`,
           {
             method: "GET",
             //credentials: "include", // Include credentials
@@ -69,7 +65,7 @@ const TopKOLLeaderboard = () => {
       }
     };
     fetchKOLData();
-  }, []);
+  }, [groupId]);
 
   // Ensure data is sorted by influence score
   const topKOLs = [...kolData]

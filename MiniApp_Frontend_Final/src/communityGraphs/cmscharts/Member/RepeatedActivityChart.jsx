@@ -56,11 +56,17 @@ const RepeatedActivityChart = ({ groupId }) => {
       }, 500); // Delay for smooth transition
     } catch (error) {
       console.error("Error fetching data:", error.message);
+      setChartData(null);
+      setIsTransitioning(false);
     }
   };
 
-  // Re-fetch when groupId or theme changes
+  // Fetch data when groupId changes
+  useEffect(() => {
+    fetchData();
+  }, [groupId]); // Now updates when groupId changes
 
+  // Detect system theme change
   useEffect(() => {
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setIsDarkMode(matchMedia.matches);
@@ -68,12 +74,10 @@ const RepeatedActivityChart = ({ groupId }) => {
     const handleChange = (e) => setIsDarkMode(e.matches);
     matchMedia.addEventListener("change", handleChange);
 
-    fetchData();
-
     return () => {
       matchMedia.removeEventListener("change", handleChange);
     };
-  }, [groupId]);
+  }, []);
 
   if (!chartData) {
     return <div>Loading chart...</div>;

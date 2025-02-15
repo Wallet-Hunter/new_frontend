@@ -42,11 +42,7 @@ const TopBotLeaderboard = () => {
 
   // Placeholder: Hardcoded data for testing
   const hardcodedData = [
-    { botId: 1, botName: "Alpha", interactionScore: 120 },
-    { botId: 2, botName: "Beta", interactionScore: 110 },
-    { botId: 3, botName: "Gamma", interactionScore: 100 },
-    { botId: 4, botName: "Delta", interactionScore: 90 },
-    { botId: 5, botName: "Epsilon", interactionScore: 80 },
+    
   ];
 
   useEffect(() => {

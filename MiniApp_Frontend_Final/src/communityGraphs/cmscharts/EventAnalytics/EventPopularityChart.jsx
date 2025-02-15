@@ -11,36 +11,31 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-const EventPopularityChart = () => {
+const EventPopularityChart = ({ groupId }) => {
   const [theme, setTheme] = useState("light");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [chartData, setChartData] = useState(null);
 
   useEffect(() => {
-    // Placeholder for fetching data from BigQuery
-
     const fetchChartData = async () => {
       try {
         const response = await fetch(
-          '${process.env.REACT_APP_SERVER_URL}/graphs/event/eventpopularitychart?group_id=${group_id}',
+          `${process.env.REACT_APP_SERVER_URL}/graphs/event/eventpopularitychart?group_id=${groupId}`,
           {
             method: "GET",
-            //credentials: "include", // Include credentials
           }
         );
         const data = await response.json();
-        if(data.error){
-        }
-        else{
+        if (!data.error) {
           const processedData = {
-          labels: data.eventNames, // Event names on the Y-axis
-          datasets: [
-            {
-              label: "Interaction Count",
-              data: data.interactionCounts,
-              backgroundColor: isDarkMode ? "rgba(67, 229, 244, 1)" : "rgba(75, 192, 192, 1)",
-            },
-          ],
+            labels: data.eventNames,
+            datasets: [
+              {
+                label: "Interaction Count",
+                data: data.interactionCounts,
+                backgroundColor: isDarkMode ? "rgba(67, 229, 244, 1)" : "rgba(75, 192, 192, 1)",
+              },
+            ],
           };
           setChartData(processedData);
         }
@@ -49,26 +44,8 @@ const EventPopularityChart = () => {
       }
     };
 
-
     fetchChartData();
-
-
-    // Hardcoded data for testing
-  //   const eventNames = ["Event A", "Event B", "Event C", "Event D"];
-  //   const interactionCounts = [150, 200, 250, 300];
-
-  //   setChartData({
-  //     labels: eventNames,
-  //     datasets: [
-  //       {
-  //         label: "Interaction Count",
-  //         data: interactionCounts,
-  //         backgroundColor: isDarkMode ? "rgba(67, 229, 244, 1)" : "rgba(75, 192, 192, 1)",
-  //       },
-  //     ],
-  //   });
-  // }, [isDarkMode]);
-  }, [])
+  }, [groupId, isDarkMode]);
 
   useEffect(() => {
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
@@ -82,78 +59,83 @@ const EventPopularityChart = () => {
     };
   }, []);
 
-  if (!chartData) {
-    return <div>Loading chart...</div>;
-  }
-
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
-      <div style={{ width: "100%", height: "90%" }} className="chart-container">
-        <Bar
-          data={chartData}
-          options={{
-            indexAxis: 'y', // Horizontal bar chart
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: {
-              duration: 1000,
-              easing: "easeOutQuart",
-            },
-            plugins: {
-              legend: {
-                display:false,
-                //position: "top",
+      <div 
+        style={{ 
+          width: "100%", 
+          height: "90%", 
+          opacity: chartData ? 1 : 0, 
+          transition: "opacity 0.5s ease-in-out" 
+        }} 
+        className="chart-container"
+      >
+        {chartData && (
+          <Bar
+            data={chartData}
+            options={{
+              indexAxis: 'y',
+              responsive: true,
+              maintainAspectRatio: false,
+              animation: {
+                duration: 1000,
+                easing: "easeOutQuart",
               },
-              tooltip: {
-                callbacks: {
-                  label: (tooltipItem) => {
-                    return `${tooltipItem.dataset.label}: ${tooltipItem.raw}`;
+              plugins: {
+                legend: {
+                  display: false,
+                },
+                tooltip: {
+                  callbacks: {
+                    label: (tooltipItem) => {
+                      return `${tooltipItem.dataset.label}: ${tooltipItem.raw}`;
+                    },
                   },
                 },
               },
-            },
-            scales: {
-              x: {
-                title: {
-                  display: true,
-                  text: "Interaction Count",
-                  color:"white"
+              scales: {
+                x: {
+                  title: {
+                    display: true,
+                    text: "Interaction Count",
+                    color: "white",
+                  },
+                  ticks: {
+                    color: "white",
+                  },
+                  grid: {
+                    color: isDarkMode
+                      ? "rgba(220, 220, 220, 0.1)"
+                      : "rgba(0, 0, 0, 0.1)",
+                  },
                 },
-                ticks:{
-                  color:"white"
-                },
-                grid: {
-                  color: isDarkMode
-                    ? "rgba(220, 220, 220, 0.1)"
-                    : "rgba(0, 0, 0, 0.1)",
+                y: {
+                  title: {
+                    display: true,
+                    text: "Event Names",
+                    color: "white",
+                  },
+                  ticks: {
+                    color: "white",
+                  },
+                  grid: {
+                    color: isDarkMode
+                      ? "rgba(220, 220, 220, 0.1)"
+                      : "rgba(0, 0, 0, 0.1)",
+                  },
                 },
               },
-              y: {
-                title: {
-                  display: true,
-                  text: "Event Names",
-                  color:"white"
-                },
-                ticks:{
-                  color:"white"
-                },
-                grid: {
-                  color: isDarkMode
-                    ? "rgba(220, 220, 220, 0.1)"
-                    : "rgba(0, 0, 0, 0.1)",
+              elements: {
+                bar: {
+                  borderRadius: 10,
+                  hoverBackgroundColor: isDarkMode
+                    ? "rgba(67, 229, 244, 0.7)"
+                    : "rgba(75, 192, 192, 0.7)",
                 },
               },
-            },
-            elements: {
-              bar: {
-                borderRadius: 10,
-                hoverBackgroundColor: isDarkMode
-                  ? "rgba(67, 229, 244, 0.7)"
-                  : "rgba(75, 192, 192, 0.7)",
-              },
-            },
-          }}
-        />
+            }}
+          />
+        )}
       </div>
       <style jsx>{`
         .chart-container:hover .chartjs-render-monitor {

@@ -18,8 +18,8 @@ const BotErrorRateChart = ({
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Example of hardcoded data for testing
-  const hardcodedLabels = ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"];
-  const hardcodedErrorRateData = [10, 15, 20, 25, 30];
+  const hardcodedLabels = [];
+  const hardcodedErrorRateData = [];
 
   const [labels, setLabels] = useState(hardcodedLabels);
   const [errorRateData, setErrorRateData] = useState(hardcodedErrorRateData);

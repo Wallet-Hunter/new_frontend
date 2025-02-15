@@ -70,8 +70,8 @@ const BotMessageFrequencyChart = ({
     // fetchData();
 
     // For testing, use hardcoded data
-    const labels = ["Bot A", "Bot B", "Bot C", "Bot D"];
-    const messagesData = [120, 95, 80, 60];
+    const labels = [];
+    const messagesData = [];
     setChartData({
       labels,
       datasets: [

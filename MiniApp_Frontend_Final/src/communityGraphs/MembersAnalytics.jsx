@@ -86,125 +86,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
           <TotalMemberNumberCard groupId={groupId} />
         </Card>
 
-        {/* Active  Member Number Card  */}
-
-        {/*Bot Vs Humans */}
-        {/* <Card
-          sx={{
-            height: "200px",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "#fff",
-            transition: "box-shadow 0.3s ease-in-out",
-            "&:hover": { boxShadow: `0px 4px 20px 0px #54d5d9` },
-          }}
-        >
-          <CardContent
-            sx={{
-              textAlign: "center",
-              padding: "8px",
-              width: "100%",
-              height: "100%",
-            }}
-          >
-            <Typography variant="h6" gutterBottom>
-              Bot vs Human
-            </Typography>
-            <Box
-              sx={{
-                flexGrow: 1,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "90%",
-                width: "90%",
-              }}
-            >
-              <DoughnutChart />
-            </Box>
-          </CardContent>
-        </Card>
-
-
-        {/* Line Chart 1 for Daily Growth */}
-        {/* <Card
-          sx={{
-            height: "200px",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "#fff",
-            transition: "box-shadow 0.3s ease-in-out",
-            "&:hover": { boxShadow: `0px 4px 20px 0px #54d5d9` },
-          }}
-        >
-          <CardContent
-            sx={{
-              textAlign: "center",
-              padding: "8px",
-              width: "100%",
-              height: "100%",
-            }}
-          >
-            <Typography variant="h6" gutterBottom>
-              Member Growth
-            </Typography>
-            <Box
-              sx={{
-                flexGrow: 1,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "90%",
-                width: "90%",
-              }}
-            >
-              <MemberGrowthChart data={lineChartData} />
-            </Box>
-          </CardContent>
-        </Card> */}
-
-        {/*Active Members HeatMap*/}
-        {/* <Card
-          sx={{
-            height: "200px",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "#fff",
-            transition: "box-shadow 0.3s ease-in-out",
-            "&:hover": { boxShadow: `0px 4px 20px 0px #54d5d9` },
-          }}
-        >
-          <CardContent
-            sx={{
-              textAlign: "center",
-              padding: "8px",
-              width: "100%",
-              height: "100%",
-            }}
-          >
-            <Typography variant="h6" gutterBottom>
-              Active Members HeatMap
-            </Typography>
-            <Box
-              sx={{
-                flexGrow: 1,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "90%",
-                width: "90%",
-              }}
-            >
-              <HeatMap data={lineChartData} />
-            </Box>
-          </CardContent>
-        </Card> */}
+        
 
         {/*Growth in 1d - 7d - 30d */}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             height: "200px",
@@ -241,10 +126,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <GrowthLineChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Total Member Activity*/}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             height: "200px",
@@ -281,7 +166,7 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <TotalMemberActivityChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Active vs Inactive Members */}
         <Card
@@ -524,7 +409,7 @@ const MemberAnalyticsGraph = ({ groupId }) => {
         </Card>
 
         {/*Offensive Content Repeaters */}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -562,10 +447,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <OffensiveContentChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Message Quality*/}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -602,10 +487,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <LowQualityMessagesChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Low Interaction Rate */}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -643,10 +528,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <LowInteractionRateChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Time-of-Posting Patterns */}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -684,10 +569,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <TimeOfPostingChart />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Overuse of Emojis/Gifs */}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -725,10 +610,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <OveruseEmojisGifsChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Frequent Self-Promoters */}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -765,10 +650,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <SelfPromoterChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Repetitive Poll Participation */}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -805,10 +690,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <RepetitivePollParticipationChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Repetitive Reactions */}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -845,10 +730,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <RepetitiveReactionsChart2 groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Inactive Periods */}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -885,10 +770,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <InactivePeriodChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Drop-Off Members */}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -926,10 +811,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <DropOffLineChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Repeated Reporting */}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -967,10 +852,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <RepeatedReportingChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Patterns of Disruptive Behavior*/}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -1008,10 +893,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <DisruptiveBehaviorChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Engagement with Admin-Posts */}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -1049,10 +934,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <AdminPostEngagementChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Repetitive Content Posting*/}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -1090,7 +975,7 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <RepetitiveContentChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Behavioral Anomalies*/}
         <Card
@@ -1134,7 +1019,7 @@ const MemberAnalyticsGraph = ({ groupId }) => {
         </Card>
 
         {/*Overactive Poll/Ticket Creation*/}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -1172,10 +1057,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <PollTicketChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Members with Warning History*/}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -1213,7 +1098,7 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <WarningHistoryChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Repetitive Reactions to Content*/}
         <Card
@@ -1256,7 +1141,7 @@ const MemberAnalyticsGraph = ({ groupId }) => {
         </Card>
 
         {/*Group Role Misuse*/}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -1293,7 +1178,7 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <RoleMisuseChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Member Contribution Consistency*/}
         <Card
@@ -1337,7 +1222,7 @@ const MemberAnalyticsGraph = ({ groupId }) => {
         </Card>
 
         {/*Event Participation Patterns*/}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -1375,10 +1260,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <EventParticipationPatternsChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Notification Overload*/}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -1416,10 +1301,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <NotificationOverloadChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Delayed Member Response Time*/}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             height: "200px",
@@ -1456,10 +1341,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <DelayedMemberResponseTimeChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Member Churn Rate*/}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             height: "200px",
@@ -1496,10 +1381,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <MemberChurnRateChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Repetitive Feedback in Surveys*/}
-        <Card
+        {/* <Card
           sx={{
             padding: 2,
             height: "200px",
@@ -1536,7 +1421,7 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <RepetitiveFeedbackChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
       </Box>
     </Box>
   );

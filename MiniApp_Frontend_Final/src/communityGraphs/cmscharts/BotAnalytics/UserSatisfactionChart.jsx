@@ -19,8 +19,8 @@ const UserSatisfactionChart = ({
 }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [dynamicData, setDynamicData] = useState({
-    labels: ["2024-12-01", "2024-12-02", "2024-12-03", "2024-12-04"], // Example dates
-    responsesData: [10, 20, 30, 25], // Example response counts for each date
+    labels: [], // Example dates
+    responsesData: [], // Example response counts for each date
   });
 
   // Fetch data from Backend (commented out for now)

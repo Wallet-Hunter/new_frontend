@@ -21,8 +21,8 @@ const ContentSharingChart = ({
 
   // State to store dynamic data fetched from the backend
   const [dynamicData, setDynamicData] = useState({
-    labels: ['Image', 'Video', 'Article'], // Default hardcoded labels for testing
-    shareCountData: [120, 80, 60], // Default hardcoded data for testing
+    labels: [], // Default hardcoded labels for testing
+    shareCountData:[], // Default hardcoded data for testing
   });
 
   const chartData = {

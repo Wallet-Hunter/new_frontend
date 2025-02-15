@@ -13,13 +13,7 @@ import styled from 'styled-components';
 const ActiveBotsChart = () => {
   const [theme, setTheme] = useState("light");
   const [data, setData] = useState([
-    { time: 'Day 1', activeBots: 5 },
-    { time: 'Day 2', activeBots: 8 },
-    { time: 'Day 3', activeBots: 12 },
-    { time: 'Day 4', activeBots: 20 },
-    { time: 'Day 5', activeBots: 15 },
-    { time: 'Day 6', activeBots: 22 },
-    { time: 'Day 7', activeBots: 25 }
+    
   ]);
 
   useEffect(() => {

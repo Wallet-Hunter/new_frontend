@@ -17,25 +17,6 @@ import TopEngagedMembersChart from "./cmscharts/Engagement/TopEngagedMembersChar
 import TotalEngagementsCard from "./cmscharts/Engagement/TotalEngagementCard";
 
 const EngagementAnalyticsGraph = ({ groupId }) => {
-  const [lineChartData, setLineChartData] = useState([]);
-  const [barChartData, setBarChartData] = useState([]);
-  const [heatMapData, setHeatMapData] = useState([]);
-
-  const fetchData = async (file, setData) => {
-    try {
-      const data = await csv(file);
-      setData(data);
-    } catch (error) {
-      console.error(`Error fetching ${file}:`, error);
-    }
-  };
-
-  // useEffect(() => {
-  //   fetchData(lineChartCsvFile, setLineChartData);
-  //   fetchData(barChartCsvFile, setBarChartData);
-  //   fetchData(heatMapCsvFile, setHeatMapData);
-  // }, [lineChartCsvFile, barChartCsvFile, heatMapCsvFile]);
-
   return (
     <Box
       sx={{
@@ -65,7 +46,7 @@ const EngagementAnalyticsGraph = ({ groupId }) => {
           }}
         >
           <CardContent>
-            <Leaderboard  groupId={groupId}/>
+            <Leaderboard groupId={groupId} />
           </CardContent>
         </Card>
       </Box>
@@ -122,7 +103,7 @@ const EngagementAnalyticsGraph = ({ groupId }) => {
                   width: "90%",
                 }}
               >
-                <TotalEngagementsCard groupId = {groupId}/>
+                <TotalEngagementsCard groupId={groupId} />
               </Box>
             </CardContent>
           </Card>
@@ -161,13 +142,13 @@ const EngagementAnalyticsGraph = ({ groupId }) => {
                   width: "90%",
                 }}
               >
-                <ActivePassiveChart groupId = {groupId}/>
+                <ActivePassiveChart groupId={groupId} />
               </Box>
             </CardContent>
           </Card>
 
           {/*Member Interactions*/}
-          <Card
+          {/* <Card
             sx={{
               backgroundColor: "#171717",
               padding: 2,
@@ -201,10 +182,10 @@ const EngagementAnalyticsGraph = ({ groupId }) => {
                   width: "90%",
                 }}
               >
-                <MemberInteractionsChart groupId={groupId}/>
+                <MemberInteractionsChart groupId={groupId} />
               </Box>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/*Engagement Trends*/}
           <Card
@@ -284,10 +265,8 @@ const EngagementAnalyticsGraph = ({ groupId }) => {
             </CardContent>
           </Card>
 
-          
-
           {/*Post Engagement*/}
-          <Card
+          {/* <Card
             sx={{
               backgroundColor: "#171717",
               padding: 2,
@@ -320,13 +299,10 @@ const EngagementAnalyticsGraph = ({ groupId }) => {
                   width: "90%",
                 }}
               >
-                <PostEngagementChart
-                  groupId={groupId}
-                 
-                />
+                <PostEngagementChart groupId={groupId} />
               </Box>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/*Engagement by Content Type*/}
           {/* <Card
@@ -401,7 +377,7 @@ const EngagementAnalyticsGraph = ({ groupId }) => {
                   width: "90%",
                 }}
               >
-                <SentimentAnalysisChart groupId={groupId}/>
+                <SentimentAnalysisChart groupId={groupId} />
               </Box>
             </CardContent>
           </Card>
@@ -449,7 +425,7 @@ const EngagementAnalyticsGraph = ({ groupId }) => {
           </Card> */}
 
           {/*Reactions Analysis*/}
-          <Card
+          {/* <Card
             sx={{
               backgroundColor: "#171717",
               padding: 2,
@@ -483,13 +459,13 @@ const EngagementAnalyticsGraph = ({ groupId }) => {
                 }}
               >
                 <ReactionsAnalysisChart
-                  groupId = {groupId}
+                  groupId={groupId}
                   reactions={["Likes", "Hearts", "Emojis"]}
                   reactionCounts={[150, 120, 90]}
                 />
               </Box>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/*Conversation Depth*/}
           {/* <Card

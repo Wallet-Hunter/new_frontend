@@ -89,14 +89,14 @@ const EventAnalyticsGraph = ({ groupId }) => {
         </Card>
 
         {/*Event Participation*/}
-        <Card sx={{ ...chartCardStyles }}>
+        {/* <Card sx={{ ...chartCardStyles }}>
           <CardContent sx={{ ...CardContentStyles }}>
             <Typography variant="h6">Event Participation</Typography>
             <Box sx={chartBoxStyles}>
               <EventParticipationChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Event Attendance Trends
           <Card sx={{ ...chartCardStyles }}>
@@ -109,14 +109,14 @@ const EventAnalyticsGraph = ({ groupId }) => {
           </Card> */}
 
         {/*Event Engagement*/}
-        <Card sx={{ ...chartCardStyles }}>
+        {/* <Card sx={{ ...chartCardStyles }}>
           <CardContent sx={{ ...CardContentStyles }}>
             <Typography variant="h6">Event Engagement</Typography>
             <Box sx={chartBoxStyles}>
               <EventEngagementChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Event Timing*/}
         {/* <Card sx={{ ...chartCardStyles }}>
@@ -129,14 +129,14 @@ const EventAnalyticsGraph = ({ groupId }) => {
         </Card> */}
 
         {/*Event Popularity*/}
-        <Card sx={{ ...chartCardStyles }}>
+         <Card sx={{ ...chartCardStyles }}>
           <CardContent sx={{ ...CardContentStyles }}>
             <Typography variant="h6">Events Popularity</Typography>
             <Box sx={chartBoxStyles}>
               <EventPopularityChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> 
 
         {/*Event Type Breakdown*/}
         <Card sx={{ ...chartCardStyles }}>
@@ -149,24 +149,24 @@ const EventAnalyticsGraph = ({ groupId }) => {
         </Card>
 
         {/*Event Conversion Rates*/}
-        <Card sx={{ ...chartCardStyles }}>
+        {/* <Card sx={{ ...chartCardStyles }}>
           <CardContent sx={{ ...CardContentStyles }}>
             <Typography variant="h6">Event Conversion</Typography>
             <Box sx={chartBoxStyles}>
               <EventConversionRatesChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Event Feedback*/}
-        <Card sx={{ ...chartCardStyles }}>
+        {/* <Card sx={{ ...chartCardStyles }}>
           <CardContent sx={{ ...CardContentStyles }}>
             <Typography variant="h6">Event Feedback</Typography>
             <Box sx={chartBoxStyles}>
               <EventFeedbackChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/*Event Impact on Growth*/}
         <Card sx={{ ...chartCardStyles }}>
@@ -192,14 +192,14 @@ const EventAnalyticsGraph = ({ groupId }) => {
           </Card> */}
 
         {/*Event Content Performance*/}
-        <Card sx={{ ...chartCardStyles }}>
+        {/* <Card sx={{ ...chartCardStyles }}>
           <CardContent sx={{ ...CardContentStyles }}>
             <Typography variant="h6">Event Content Performance</Typography>
             <Box sx={{ ...chartBoxStyles }}>
               <EventContentPerformance groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Event Promotions
           <Card sx={{ ...chartCardStyles }}>
@@ -219,14 +219,14 @@ const EventAnalyticsGraph = ({ groupId }) => {
 
         {/*Follow-up Engagement*/}
 
-        <Card sx={{ ...chartCardStyles }}>
+        {/* <Card sx={{ ...chartCardStyles }}>
           <CardContent sx={{ ...CardContentStyles }}>
             <Typography variant="h6">Follow-up Engagement</Typography>
             <Box sx={{ ...chartBoxStyles }}>
               <FollowupEngagementChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card>
+        </Card> */}
       </Box>
     </Box>
   );

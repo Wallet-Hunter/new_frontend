@@ -23,11 +23,7 @@ const InteractionRateChart = ({
 
   // Hardcoded fallback data
   const hardcodedData = [
-    { bot_name: "Bot A", message_count: 120 },
-    { bot_name: "Bot B", message_count: 95 },
-    { bot_name: "Bot C", message_count: 80 },
-    { bot_name: "Bot D", message_count: 65 },
-    { bot_name: "Bot E", message_count: 50 },
+    
   ];
 
   useEffect(() => {

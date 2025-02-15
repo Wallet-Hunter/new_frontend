@@ -9,61 +9,41 @@ import {
   Legend,
 } from "chart.js";
 
+// Register necessary ChartJS components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-const RepetitiveReactionsChart = ({
-  backgroundColorLight = "rgba(75, 192, 192, 1)",
-  backgroundColorDark = "rgba(67, 229, 244, 1)",
-}) => {
+const RepetitiveReactionsChart = ({ groupId, backgroundColorLight = "rgba(75, 192, 192, 1)", backgroundColorDark = "rgba(67, 229, 244, 1)" }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [senderNames, setSenderNames] = useState([]); // Sender names
-  const [reactionsCounts, setReactionsCounts] = useState([]); // Reactions counts
+  const [senderNames, setSenderNames] = useState([]);
+  const [reactionsCounts, setReactionsCounts] = useState([]);
 
-  // Fetch data from Backend (currently commented out)
-  // const fetchData = async () => {
-  //   try {
-  //     const response = await fetch("${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/messages?{group_id}", {
-  //       method: "GET",
-  //       //credentials: "include", // Include credentials (cookies, etc.)
-  //     });
-  //     // Parse the JSON response
-  //     const result = await response.json();
-  //     setData(result);
-  //     console.log("Data successfully fetched from the backend:");
-  //     console.log(result); // Log the result for debugging
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error.message);
-  //   }
-  // };
-
-  // Hardcoded data for testing (replace this with your actual fetched data)
-  const hardcodedData = {
-    senderNames: ["User1", "User2", "User3", "User4", "User5"],
-    reactionsCounts: [15, 30, 45, 25, 50],
+  // Function to fetch repetitive reactions data from the backend API
+  const fetchData = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/graphs/member/repetitivereactions?group_id=${groupId}`
+      );
+      const result = await response.json();
+      
+      if (result && result.repetitive_reactions) {
+        const names = result.repetitive_reactions.map(item => item.sender_name);
+        const reactions = result.repetitive_reactions.map(item => item.repeated_reactions);
+        
+        setSenderNames(names);
+        setReactionsCounts(reactions);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error.message);
+    }
   };
 
-  // Use hardcoded data for now (fetchedData will be used once the API is functional)
+  // Fetch data when the component mounts or groupId changes
   useEffect(() => {
-    setSenderNames(hardcodedData.senderNames);
-    setReactionsCounts(hardcodedData.reactionsCounts);
-  }, []);
+    fetchData();
+  }, [groupId]);
 
-  // Chart data configuration
-  const chartData = {
-    labels: senderNames, // Sender names as Y-axis labels
-    datasets: [
-      {
-        label: "Total Reactions", // Dataset label
-        data: reactionsCounts, // Total reactions counts
-        backgroundColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
-        borderColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
-        borderWidth: 1,
-      },
-    ],
-  };
-
+  // Detect and apply dark mode preferences
   useEffect(() => {
-    // Detect dark mode preference
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setIsDarkMode(matchMedia.matches);
 
@@ -74,6 +54,20 @@ const RepetitiveReactionsChart = ({
       matchMedia.removeEventListener("change", handleChange);
     };
   }, []);
+
+  // Chart dataset and configurations
+  const chartData = {
+    labels: senderNames,
+    datasets: [
+      {
+        label: "Total Reactions",
+        data: reactionsCounts,
+        backgroundColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
+        borderColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
+        borderWidth: 1,
+      },
+    ],
+  };
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
@@ -90,13 +84,11 @@ const RepetitiveReactionsChart = ({
             },
             plugins: {
               legend: {
-                display: false, // Disable legend
+                display: false,
               },
               tooltip: {
                 callbacks: {
-                  label: (tooltipItem) => {
-                    return `Total Reactions: ${tooltipItem.raw}`; // Tooltip shows reactions count
-                  },
+                  label: (tooltipItem) => `Total Reactions: ${tooltipItem.raw}`,
                 },
               },
             },
@@ -104,27 +96,26 @@ const RepetitiveReactionsChart = ({
               x: {
                 title: {
                   display: true,
-                  text: "Total Reactions", // X-axis title
-                  color:"white"
+                  text: "Total Reactions",
+                  color: isDarkMode ? "#fff" : "#000",
                 },
                 ticks: {
-                  color: "#fff", // X-axis tick color
+                  color: isDarkMode ? "#fff" : "#000",
                 },
                 beginAtZero: true,
                 grid: {
-                  color: isDarkMode
-                    ? "rgba(220, 220, 220, 0.1)"
-                    : "rgba(0, 0, 0, 0.1)",
+                  color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
                 },
               },
               y: {
                 title: {
                   display: true,
-                  text: "Sender Name", // Y-axis title
-                  color:"white"
+                  text: "Sender Name",
+                  color: isDarkMode ? "#fff" : "#000",
                 },
                 ticks: {
-                  color: "#fff", // X-axis tick color
+                  display:false,
+                  color: isDarkMode ? "#fff" : "#000",
                 },
                 grid: {
                   display: false,
@@ -134,9 +125,6 @@ const RepetitiveReactionsChart = ({
             elements: {
               bar: {
                 borderRadius: 10,
-                backgroundColor: isDarkMode
-                  ? backgroundColorDark
-                  : backgroundColorLight,
                 hoverBackgroundColor: isDarkMode
                   ? `${backgroundColorDark}CC`
                   : `${backgroundColorLight}CC`,
@@ -146,8 +134,8 @@ const RepetitiveReactionsChart = ({
         />
       </div>
       <style jsx>{`
-        .chart-container:hover .chartjs-render-monitor {
-          transform: scale(1.05); /* Scale the chart on hover */
+        .chart-container:hover {
+          transform: scale(1.05);
           transition: transform 0.3s ease;
         }
       `}</style>

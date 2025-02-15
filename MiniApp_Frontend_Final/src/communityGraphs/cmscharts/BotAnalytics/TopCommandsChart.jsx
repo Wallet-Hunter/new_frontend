@@ -23,11 +23,7 @@ const TopCommandChart = ({
 
   // Hardcoded fallback data for bot commands
   const hardcodedData = [
-    { command_name: "/start", frequency: 150 },
-    { command_name: "/help", frequency: 100 },
-    { command_name: "/settings", frequency: 75 },
-    { command_name: "/about", frequency: 50 },
-    { command_name: "/feedback", frequency: 30 },
+    
   ];
 
   useEffect(() => {

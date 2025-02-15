@@ -62,8 +62,8 @@ const BotFailuresChart = ({
     // Simulated data fetch for testing purposes
     const fetchDataForTesting = async () => {
       const result = {
-        labels: ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5"],
-        failuresData: [12, 19, 3, 5, 2], // Simulated failure data
+        labels:[],
+        failuresData: [], // Simulated failure data
       };
       setData({
         labels: result.labels,

@@ -13,13 +13,7 @@ import styled from 'styled-components';
 const BotResponseTimeChart = () => {
   const [theme, setTheme] = useState("light");
   const [data, setData] = useState([
-    { time: 'Day 1', responseTime: 500 },
-    { time: 'Day 2', responseTime: 450 },
-    { time: 'Day 3', responseTime: 600 },
-    { time: 'Day 4', responseTime: 550 },
-    { time: 'Day 5', responseTime: 400 },
-    { time: 'Day 6', responseTime: 650 },
-    { time: 'Day 7', responseTime: 700 }
+    
   ]); // Default hardcoded data
 
   // Fetching data logic (commented for now)

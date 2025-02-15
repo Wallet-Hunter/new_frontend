@@ -10,19 +10,11 @@ import {
 } from "recharts";
 import styled from "styled-components";
 
-const BehavioralAnomaliesChart = () => {
+const BehavioralAnomaliesChart = ({ groupId }) => {
   const [theme, setTheme] = useState("light");
-  const [data, setData] = useState([
-    // Hardcoded data for testing
-    { memberId: "M001", activityAnomalyScore: 12 },
-    { memberId: "M002", activityAnomalyScore: 45 },
-    { memberId: "M003", activityAnomalyScore: 78 },
-    { memberId: "M004", activityAnomalyScore: 34 },
-    { memberId: "M005", activityAnomalyScore: 90 },
-  ]);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    // Set theme based on system preference
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setTheme(matchMedia.matches ? "dark" : "light");
 
@@ -32,28 +24,21 @@ const BehavioralAnomaliesChart = () => {
 
     matchMedia.addEventListener("change", handleThemeChange);
 
-    // Fetch data dynamically (BigQuery logic placeholder)
     const fetchData = async () => {
       try {
-        // Uncomment this part when you are ready to fetch from your backend or BigQuery
-        /*
-        const response = await fetch("${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/messages?{group_id}", {
-          method: "GET",
-          //credentials: "include", // Include credentials (cookies, etc.)
-        });
-
-        // Parse the JSON response
+        const response = await fetch(
+          `${process.env.REACT_APP_SERVER_URL}/graphs/member/behavioralanomalies?group_id=${groupId}`
+        );
         const result = await response.json();
-        //setData(hardcodeddData)
-        setData(result);
-        console.log("Data successfully fetched from the backend:");
-        console.log(result); // Log the result for debugging
-        */
-        console.log("Fetching data from backend...");
-        // Simulating an API call delay
-        setTimeout(() => {
-          console.log("Data fetched successfully (hardcoded for now).");
-        }, 1000);
+
+        // Transform data to fit the chart's needs
+        const formattedData = result.behavioral_anomalies.map((entry) => ({
+          memberName: entry.sender_name, // Use sender_name for X-axis
+          activityAnomalyScore: entry.anomalies, // Use anomalies as Y-axis value
+        }));
+
+        setData(formattedData);
+        console.log("Data successfully fetched and formatted:", formattedData);
       } catch (error) {
         console.error("Error fetching data:", error.message);
       }
@@ -64,25 +49,22 @@ const BehavioralAnomaliesChart = () => {
     return () => {
       matchMedia.removeEventListener("change", handleThemeChange);
     };
-  }, []);
+  }, [groupId]);
 
   return (
     <ChartContainer className={theme}>
       <ResponsiveContainer width="100%" height="90%">
-        <RechartsLineChart
-          data={data}
-          //margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
-        >
+        <RechartsLineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" />
           <XAxis
-            dataKey="memberId"
+            dataKey="memberName" // Updated to use sender_name
             label={{
-              value: "Member IDs",
+              value: "Member's",
               position: "insideBottomRight",
               style: { fill: "white", fontSize: "12px" },
               offset: -5,
             }}
-            tick={{ fill: "var(--axis-color)", fontSize: "0.8em" }}
+            tick={{ display: "none" }} 
           />
           <YAxis
             label={{
@@ -120,7 +102,7 @@ const BehavioralAnomaliesChart = () => {
   );
 };
 
-// Styled components for LineChart
+// Styled components remain the same
 const ChartContainer = styled.div`
   width: 100%;
   height: 100%;

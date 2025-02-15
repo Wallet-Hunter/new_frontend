@@ -13,13 +13,7 @@ import styled from 'styled-components';
 const UserEngagementChart = () => {
   const [theme, setTheme] = useState("light");
   const [data, setData] = useState([
-    { time: 'Day 1', botA: 30, botB: 50 },
-    { time: 'Day 2', botA: 40, botB: 60 },
-    { time: 'Day 3', botA: 35, botB: 55 },
-    { time: 'Day 4', botA: 50, botB: 70 },
-    { time: 'Day 5', botA: 45, botB: 65 },
-    { time: 'Day 6', botA: 60, botB: 80 },
-    { time: 'Day 7', botA: 55, botB: 75 }
+    
   ]);
 
   useEffect(() => {

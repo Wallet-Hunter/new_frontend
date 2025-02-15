@@ -13,16 +13,7 @@ import styled from 'styled-components';
 const BotEngagementChart = () => {
   const [theme, setTheme] = useState("light");
   const [data, setData] = useState([
-    { hour: '0:00', botMessages: 5 },
-    { hour: '1:00', botMessages: 8 },
-    { hour: '2:00', botMessages: 12 },
-    { hour: '3:00', botMessages: 7 },
-    { hour: '4:00', botMessages: 10 },
-    { hour: '5:00', botMessages: 4 },
-    { hour: '6:00', botMessages: 15 },
-    { hour: '7:00', botMessages: 20 },
-    { hour: '8:00', botMessages: 25 },
-    { hour: '9:00', botMessages: 30 }
+    
   ]); // Default hardcoded data
 
   // Fetching data logic (commented for now)

@@ -107,10 +107,11 @@ const ContentRepetitionChart = ({ groupId }) => {
               x: {
                 title: {
                   display: true,
-                  text: "Sender Name",
+                  text: "Sender's",
                   color: "white",
                 },
                 ticks: {
+                  display:false,
                   color: "#fff",
                 },
                 grid: {

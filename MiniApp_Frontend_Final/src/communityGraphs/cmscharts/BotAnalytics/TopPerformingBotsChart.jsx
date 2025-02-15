@@ -20,8 +20,8 @@ const TopPerformingBotsChart = ({
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Mock data for testing before fetching dynamic data
-  const mockBotNames = ["Bot A", "Bot B", "Bot C", "Bot D"];
-  const mockEngagementLevels = [250, 400, 550, 600];
+  const mockBotNames = []
+  const mockEngagementLevels = []
 
   // Set the chart data using either dynamic or mock data
   const chartData = {

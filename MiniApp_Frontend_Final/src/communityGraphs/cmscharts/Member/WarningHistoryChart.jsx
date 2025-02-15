@@ -11,7 +11,7 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-const WarningHistoryChart = () => {
+const WarningHistoryChart = ({groupId}) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [chartData, setChartData] = useState({
     labels: [],
@@ -27,43 +27,43 @@ const WarningHistoryChart = () => {
     matchMedia.addEventListener("change", handleChange);
 
     // Fetch data from Backend (commented out for now)
-    // const fetchData = async () => {
-    //   try {
-    //     const response = await fetch("${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/messages?{group_id}", {
-    //       method: "GET",
-    //       //credentials: "include", // Include credentials (cookies, etc.)
-    //     });
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/messages?group_id =${groupId}`, {
+          method: "GET",
+          //credentials: "include", // Include credentials (cookies, etc.)
+        });
 
-    //     // Parse the JSON response
-    //     const result = await response.json();
-    //     console.log("Data successfully fetched from the backend:");
-    //     console.log(result); // Log the result for debugging
+        // Parse the JSON response
+        const result = await response.json();
+        console.log("Data successfully fetched from the backend:");
+        console.log(result); // Log the result for debugging
 
-    //     // Assuming the result is an array of objects with `member` and `warningCount`
-    //     const warningLabels = result.map(item => item.member);
-    //     const warningCounts = result.map(item => item.warningCount);
+        // Assuming the result is an array of objects with `member` and `warningCount`
+        const warningLabels = result.map(item => item.member);
+        const warningCounts = result.map(item => item.warningCount);
 
-    //     // Set chart data using fetched data
-    //     setChartData({
-    //       labels: warningLabels,
-    //       datasets: [
-    //         {
-    //           label: "Number of Warnings Received",
-    //           data: warningCounts,
-    //           backgroundColor: isDarkMode
-    //             ? "rgba(67, 229, 244, 1)" // Dark mode: Blue tone
-    //             : "rgba(75, 192, 192, 1)", // Light mode: Green tone
-    //           borderColor: isDarkMode
-    //             ? "rgba(67, 229, 244, 1)"
-    //             : "rgba(75, 192, 192, 1)",
-    //           borderWidth: 1,
-    //         },
-    //       ],
-    //     });
-    //   } catch (error) {
-    //     console.error("Error fetching data:", error.message);
-    //   }
-    // };
+        // Set chart data using fetched data
+        setChartData({
+          labels: warningLabels,
+          datasets: [
+            {
+              label: "Number of Warnings Received",
+              data: warningCounts,
+              backgroundColor: isDarkMode
+                ? "rgba(67, 229, 244, 1)" // Dark mode: Blue tone
+                : "rgba(75, 192, 192, 1)", // Light mode: Green tone
+              borderColor: isDarkMode
+                ? "rgba(67, 229, 244, 1)"
+                : "rgba(75, 192, 192, 1)",
+              borderWidth: 1,
+            },
+          ],
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error.message);
+      }
+    };
 
     // Hardcoded test data for "Members with Warning History"
     const warningLabels = [
@@ -94,7 +94,7 @@ const WarningHistoryChart = () => {
     });
 
     return () => matchMedia.removeEventListener("change", handleChange);
-  }, [isDarkMode]);
+  }, [groupId]);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>

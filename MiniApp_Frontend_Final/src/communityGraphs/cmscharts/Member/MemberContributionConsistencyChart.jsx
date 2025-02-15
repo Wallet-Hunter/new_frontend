@@ -10,37 +10,31 @@ import {
 } from "recharts";
 import styled from "styled-components";
 
-const MemberContributionConsistencyChart = () => {
+const MemberContributionConsistencyChart = ({ groupId }) => {
   const [theme, setTheme] = useState("light");
-  const [data, setData] = useState([
-    // Hardcoded data for testing
-    { memberId: "M001", contributionFrequency: 10 },
-    { memberId: "M002", contributionFrequency: 25 },
-    { memberId: "M003", contributionFrequency: 50 },
-    { memberId: "M004", contributionFrequency: 20 },
-    { memberId: "M005", contributionFrequency: 40 },
-  ]);
+  const [data, setData] = useState([]);
 
-  // Uncomment and modify the following code to fetch data dynamically from Backend
-  /*
+  // Fetch data from the backend
   const fetchData = async () => {
     try {
-      const response = await fetch("${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/messages?{group_id}", {
-        method: "GET",
-        //credentials: "include", // Include credentials (cookies, etc.)
-      });
-
-      // Parse the JSON response
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/graphs/member/membercontribution?group_id=${groupId}`
+      );
       const result = await response.json();
-      // Set the fetched data
-      setData(result);
-      console.log("Data successfully fetched from the backend:");
-      console.log(result); // Log the result for debugging
+
+      if (result.contribution_frequency) {
+        const formattedData = result.contribution_frequency.map((item) => ({
+          name: item.name, // Use member's name instead of ID
+          contributionFrequency: item.contribution_frequency, // Keep frequency
+        }));
+
+        setData(formattedData); // Update state with formatted data
+        console.log("Data successfully fetched:", formattedData); // Log formatted data
+      }
     } catch (error) {
       console.error("Error fetching data:", error.message);
     }
   };
-  */
 
   useEffect(() => {
     // Set theme based on system preference
@@ -53,23 +47,22 @@ const MemberContributionConsistencyChart = () => {
 
     matchMedia.addEventListener("change", handleThemeChange);
 
+    fetchData(); // Fetch data on component mount
+
     return () => {
       matchMedia.removeEventListener("change", handleThemeChange);
     };
-  }, []);
+  }, [groupId]);
 
   return (
     <ChartContainer className={theme}>
       <ResponsiveContainer width="100%" height="90%">
-        <RechartsLineChart
-          data={data}
-          // margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
-        >
+        <RechartsLineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" />
           <XAxis
-            dataKey="memberId"
+            dataKey="name" // Display member names instead of IDs
             label={{
-              value: "Member IDs",
+              value: "Members",
               position: "insideBottomRight",
               style: { fill: "white", fontSize: "12px" },
               offset: -5,
@@ -119,7 +112,7 @@ const ChartContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: "black";
+  background-color: transparent;
 
   &.light {
     --line-color: #43e5f4;

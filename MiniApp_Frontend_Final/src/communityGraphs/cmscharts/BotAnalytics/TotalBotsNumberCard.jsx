@@ -28,7 +28,7 @@ const NumberCard = ({ title }) => {
     */
 
     // Hardcoded data for testing purposes
-    setNumber(42); // Set a hardcoded number for testing
+    setNumber(); // Set a hardcoded number for testing
   }, []);
 
   return (

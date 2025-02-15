@@ -79,9 +79,9 @@ const BotEngagementChart = () => {
     // fetchData();
 
     // Hardcoded data for testing
-    const dates = ["2024-12-20", "2024-12-21", "2024-12-22", "2024-12-23"];
-    const replies = [100, 120, 90, 150];
-    const forwards = [50, 60, 70, 80];
+    const dates = [];
+    const replies = [];
+    const forwards =[];
 
     setChartData({
       labels: dates,
