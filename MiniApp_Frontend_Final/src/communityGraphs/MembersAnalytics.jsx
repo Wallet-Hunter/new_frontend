@@ -450,7 +450,7 @@ const MemberAnalyticsGraph = ({ groupId }) => {
         </Card> */}
 
         {/*Message Quality*/}
-        {/* <Card
+        <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -487,10 +487,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <LowQualityMessagesChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card> */}
+        </Card>
 
         {/*Low Interaction Rate */}
-        {/* <Card
+        <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -528,10 +528,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <LowInteractionRateChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card> */}
+        </Card>
 
         {/*Time-of-Posting Patterns */}
-        {/* <Card
+         <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -566,10 +566,10 @@ const MemberAnalyticsGraph = ({ groupId }) => {
                 width: "90%",
               }}
             >
-              <TimeOfPostingChart />
+              <TimeOfPostingChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card> */}
+        </Card>
 
         {/*Overuse of Emojis/Gifs */}
         {/* <Card
@@ -613,7 +613,7 @@ const MemberAnalyticsGraph = ({ groupId }) => {
         </Card> */}
 
         {/*Frequent Self-Promoters */}
-        {/* <Card
+         <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -650,7 +650,7 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <SelfPromoterChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card> */}
+        </Card> 
 
         {/*Repetitive Poll Participation */}
         {/* <Card

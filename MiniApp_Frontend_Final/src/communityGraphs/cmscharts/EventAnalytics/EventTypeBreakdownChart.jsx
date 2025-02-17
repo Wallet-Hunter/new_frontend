@@ -18,7 +18,7 @@ const EventTypeBreakdownChart = ({ title, groupId }) => {
 
       if (!result || !result.rows || !Array.isArray(result.rows) || result.rows.length === 0) {
         console.warn("No event data received.");
-        setEventData({ labels: ["No Data"], values: [1] }); // Fallback to prevent crashes
+        setEventData({ labels: ["No Data"], values: [0] }); // Fallback to prevent crashes
         return;
       }
 
@@ -28,11 +28,11 @@ const EventTypeBreakdownChart = ({ title, groupId }) => {
       setEventData({ labels, values });
     } catch (error) {
       console.error("Error fetching data from API:", error);
-      setEventData({ labels: ["Error"], values: [1] });
+      setEventData({ labels: ["Error"], values: [0] });
     }
   };
 
-  const totalValue = eventData.values.reduce((acc, value) => acc + value, 0) || 1;
+  const totalValue = eventData.values.reduce((acc, value) => acc + value, 0) || 0;
 
   useEffect(() => {
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");

@@ -12,47 +12,38 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 const MessageQualityChart = ({
+  groupId,
   backgroundColorLight = "rgba(75, 192, 192, 1)",
   backgroundColorDark = "rgba(67, 229, 244, 1)",
 }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [memberIDs, setMemberIDs] = useState([]); // Member IDs for X-axis
-  const [qualityScores, setQualityScores] = useState([]); // Quality score
-  const [isDataLoaded, setIsDataLoaded] = useState(false); // Flag to check if data is loaded
+  const [memberIDs, setMemberIDs] = useState([]);
+  const [qualityScores, setQualityScores] = useState([]);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
-  // Hardcoded data for testing
-  const hardcodedData = {
-    memberIDs: ["M1", "M2", "M3", "M4", "M5"],
-    qualityScores: [85, 70, 90, 60, 75],
+  // Fetch dynamic data
+  const fetchData = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/graphs/member/lowqualitymessage?group_id=${groupId}`
+      );
+      const result = await response.json();
+
+      if (result.data) {
+        const members = result.data.map((item) => item.sender_name);
+        const scores = result.data.map((item) => item.total_quality_messages);
+
+        setMemberIDs(members);
+        setQualityScores(scores);
+        setIsDataLoaded(true);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error.message);
+    }
   };
 
-  // Fetch dynamic data (e.g., from Backend)
-  // const fetchData = async () => {
-  //   try {
-  //     const response = await fetch("${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/messages?{group_id}", {
-  //       method: "GET",
-  //       //credentials: "include", // Include credentials (cookies, etc.)
-  //     });
-  //
-  //     // Parse the JSON response
-  //     const result = await response.json();
-  //     // setData(hardcodedData)
-  //     setData(result);
-  //     console.log("Data successfully fetched from the backend:");
-  //     console.log(result); // Log the result for debugging
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error.message);
-  //   }
-  // };
-
   useEffect(() => {
-    // For testing, use hardcoded data
-    setMemberIDs(hardcodedData.memberIDs);
-    setQualityScores(hardcodedData.qualityScores);
-    setIsDataLoaded(true);
-
-    // Uncomment the line below to fetch real data from an API (Backend)
-    // fetchData();
+    fetchData(); // Fetch real data from API
 
     // Detect dark mode preference
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
@@ -64,19 +55,19 @@ const MessageQualityChart = ({
     return () => {
       matchMedia.removeEventListener("change", handleChange);
     };
-  }, []);
+  }, [groupId]);
 
   if (!isDataLoaded) {
-    return <div>Loading chart data...</div>; // Display loading message while data is being fetched
+    return <div>Loading chart data...</div>;
   }
 
   // Chart data configuration
   const chartData = {
-    labels: memberIDs, // Member IDs as X-axis labels
+    labels: memberIDs,
     datasets: [
       {
-        label: "Quality Score", // Dataset label
-        data: qualityScores, // Quality score
+        label: "Quality Score",
+        data: qualityScores,
         backgroundColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
         borderColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
         borderWidth: 1,
@@ -98,13 +89,11 @@ const MessageQualityChart = ({
             },
             plugins: {
               legend: {
-                display: false, // Disable legend
+                display: false,
               },
               tooltip: {
                 callbacks: {
-                  label: (tooltipItem) => {
-                    return `Quality Score: ${tooltipItem.raw}`; // Tooltip shows quality score
-                  },
+                  label: (tooltipItem) => `Quality Score: ${tooltipItem.raw}`,
                 },
               },
             },
@@ -112,11 +101,12 @@ const MessageQualityChart = ({
               x: {
                 title: {
                   display: true,
-                  text: "Member IDs", // X-axis title
+                  text: "Members",
                   color: "white",
                 },
                 ticks: {
-                  color: "#fff", // X-axis tick color
+                  display:false,
+                  color: "#fff",
                 },
                 grid: {
                   display: false,
@@ -125,26 +115,22 @@ const MessageQualityChart = ({
               y: {
                 title: {
                   display: true,
-                  text: "Quality Score", // Y-axis title
+                  text: "Quality Score",
                   color: "white",
                 },
                 ticks: {
-                  color: "#fff", // Y-axis tick color
+                  color: "#fff",
                 },
                 beginAtZero: true,
                 grid: {
-                  color: isDarkMode
-                    ? "rgba(220, 220, 220, 0.1)"
-                    : "rgba(0, 0, 0, 0.1)",
+                  color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
                 },
               },
             },
             elements: {
               bar: {
                 borderRadius: 10,
-                backgroundColor: isDarkMode
-                  ? backgroundColorDark
-                  : backgroundColorLight,
+                backgroundColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
                 hoverBackgroundColor: isDarkMode
                   ? `${backgroundColorDark}CC`
                   : `${backgroundColorLight}CC`,
@@ -153,12 +139,6 @@ const MessageQualityChart = ({
           }}
         />
       </div>
-      <style jsx>{`
-        .chart-container:hover .chartjs-render-monitor {
-          transform: scale(1.05); /* Scale the chart on hover */
-          transition: transform 0.3s ease;
-        }
-      `}</style>
     </div>
   );
 };

@@ -10,61 +10,31 @@ import {
 } from "recharts";
 import styled from "styled-components";
 
-const TimeOfPostingChart = () => {
+const TimeOfPostingChart = ({ groupId }) => {
   const [theme, setTheme] = useState("light");
   const [data, setData] = useState([]);
+  
 
-  // Function to fetch data from Backend (commented for now)
-  /* const fetchData = async () => {
+  
+  // Function to fetch data from the backend and format it
+  const fetchData = async () => {
     try {
-      const response = await fetch("${process.env.REACT_APP_SERVER_URL}/graphs/member/messages?{group_id}", {
-        method: "GET",
-        //credentials: "include", // Include credentials (cookies, etc.)
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/graphs/member/timeofposting?group_id=${groupId}`
+      );
 
-      // Parse the JSON response
       const result = await response.json();
-      //setData(hardcodeddData)
-      setData(result);
-      console.log("Data successfully fetched from the backend:");
-      console.log(result); // Log the result for debugging
+
+      // Transform backend data format to match frontend expectations
+      const formattedData = result.data.map((item) => ({
+        time: item.hour_of_day, // Convert 'hour_of_day' to 'time'
+        activity_count: item.total_message_count, // Convert 'total_message_count' to 'activity_count'
+      }));
+
+      setData(formattedData);
+      console.log("Formatted Data:", formattedData); // Debugging log
     } catch (error) {
       console.error("Error fetching data:", error.message);
-    }
-  }; */
-
-  // Function to fetch mock data (as a placeholder for now)
-  const fetchDataFromBigQuery = async () => {
-    try {
-      const testData = [
-        { time: 0, activity_count: 5 },  // 12:00 AM
-        { time: 1, activity_count: 8 },  // 1:00 AM
-        { time: 2, activity_count: 3 },  // 2:00 AM
-        { time: 3, activity_count: 6 },  // 3:00 AM
-        { time: 4, activity_count: 4 },  // 4:00 AM
-        { time: 5, activity_count: 9 },  // 5:00 AM
-        { time: 6, activity_count: 12 }, // 6:00 AM
-        { time: 7, activity_count: 10 }, // 7:00 AM
-        { time: 8, activity_count: 14 }, // 8:00 AM
-        { time: 9, activity_count: 15 }, // 9:00 AM
-        { time: 10, activity_count: 13 }, // 10:00 AM
-        { time: 11, activity_count: 16 }, // 11:00 AM
-        { time: 12, activity_count: 20 }, // 12:00 PM
-        { time: 13, activity_count: 18 }, // 1:00 PM
-        { time: 14, activity_count: 17 }, // 2:00 PM
-        { time: 15, activity_count: 19 }, // 3:00 PM
-        { time: 16, activity_count: 22 }, // 4:00 PM
-        { time: 17, activity_count: 25 }, // 5:00 PM
-        { time: 18, activity_count: 28 }, // 6:00 PM
-        { time: 19, activity_count: 24 }, // 7:00 PM
-        { time: 20, activity_count: 21 }, // 8:00 PM
-        { time: 21, activity_count: 18 }, // 9:00 PM
-        { time: 22, activity_count: 16 }, // 10:00 PM
-        { time: 23, activity_count: 10 }, // 11:00 PM
-      ];
-      setData(testData);
-    } catch (error) {
-      console.error("Error fetching data:", error);
     }
   };
 
@@ -79,13 +49,13 @@ const TimeOfPostingChart = () => {
 
     matchMedia.addEventListener("change", handleThemeChange);
 
-    // Fetch data when the component mounts
-    fetchDataFromBigQuery();
+    // Fetch data from backend
+    fetchData();
 
     return () => {
       matchMedia.removeEventListener("change", handleThemeChange);
     };
-  }, []);
+  }, [groupId]);
 
   return (
     <ChartContainer className={theme}>
@@ -101,7 +71,7 @@ const TimeOfPostingChart = () => {
               style: { fill: "white", fontSize: "12px" },
             }}
             tick={{ fill: "var(--axis-color)", fontSize: "0.8em" }}
-            domain={['auto', 'auto']}
+            domain={["auto", "auto"]}
             tickFormatter={(time) => `${time}:00`} // Format X-axis time as hour
           />
           <YAxis
@@ -114,7 +84,7 @@ const TimeOfPostingChart = () => {
               style: { fill: "white", fontSize: "12px" },
             }}
             tick={{ fill: "var(--axis-color)", fontSize: "0.8em" }}
-            domain={['auto', 'auto']}
+            domain={["auto", "auto"]}
           />
           <Tooltip
             cursor={{ fill: "rgba(255, 255, 255, 0.1)" }}

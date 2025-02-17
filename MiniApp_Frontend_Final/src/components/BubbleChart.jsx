@@ -19,26 +19,7 @@ const BubbleChart = ({ group_id }) => {
 
   // Hardcoded data for testing
   const hardcodedData = [
-    { name: "John Doe", value: 30 },
-    { name: "Jane Smith", value: 45 },
-    { name: "Michael Johnson", value: 20 },
-    { name: "Emily Davis", value: 60 },
-    { name: "Daniel Wilson", value: 80 },
-    { name: "Sophia Brown", value: 15 },
-    { name: "James Taylor", value: 40 },
-    { name: "Olivia Anderson", value: 70 },
-    { name: "William Thomas", value: 25 },
-    { name: "Ava Martinez", value: 50 },
-    { name: "Isabella Garcia", value: 35 },
-    { name: "Ethan Lee", value: 55 },
-    { name: "Mia Moore", value: 65 },
-    { name: "Alexander Harris", value: 75 },
-    { name: "Charlotte Clark", value: 85 },
-    { name: "Mason Lewis", value: 95 },
-    { name: "Amelia Walker", value: 10 },
-    { name: "Henry Young", value: 20 },
-    { name: "Grace King", value: 30 },
-    { name: "Lucas Hall", value: 40 },
+    
   ];
 
   // Dynamic data fetching logic
@@ -177,25 +158,26 @@ const BubbleChart = ({ group_id }) => {
       .attr("stroke", (d) => d.data.color)
       .attr("stroke-width", 0.5);
 
-    bubble
+      bubble
       .append("text")
       .attr("dy", "0.3em")
       .attr("text-anchor", "middle")
-      .text((d) => d.data.name)
+      .text((d) => d.data.name.toUpperCase()) // Convert to uppercase
       .style("fill", (d) => d.data.color)
-      .style('font-weight', 'bold') 
+      .style("font-weight", "bold") 
       .attr("font-size", (d) => `${Math.min(d.r / 4, 10)}px`)
       .attr("pointer-events", "all");
-
+    
     bubble
       .append("text")
       .attr("dy", "1.5em")
       .attr("text-anchor", "middle")
-      .text((d) => `${d.data.value}%`)
+      .text((d) => `${d.data.value}%`.toUpperCase()) // Convert percentage text to uppercase
       .style("fill", (d) => d.data.color)
       .style("fill-opacity", 0.7)
       .attr("font-size", (d) => `${Math.min(d.r / 4, 8)}px`)
       .attr("pointer-events", "none");
+    
 
     return () => {
       tooltip.remove();

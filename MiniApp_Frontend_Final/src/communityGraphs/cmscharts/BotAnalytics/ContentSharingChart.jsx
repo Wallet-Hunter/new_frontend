@@ -76,8 +76,7 @@ const ContentSharingChart = ({
 
     // Temporary hardcoded data for testing
     const fetchedData = {
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-      shareCountData: [40, 70, 60, 90, 120],
+      
     };
     setDynamicData(fetchedData);
   }, []);
