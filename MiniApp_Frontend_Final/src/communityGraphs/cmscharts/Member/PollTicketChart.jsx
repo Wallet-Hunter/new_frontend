@@ -14,6 +14,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 const PollTicketChart = ({ groupId }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
+ 
 
   // Fetch data from backend
   const fetchData = async () => {

@@ -30,10 +30,40 @@ const AnalyticsPage = () => {
     "Anonymous",
   ];
 
+  // Hardcoded visibility (change these values to test)
+  const [visibleSections, setVisibleSections] = useState([
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+  ]);
+
+  /*
+  // Fetch visibility settings from backend (Commented out for now)
+  const fetchSectionVisibility = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/getSectionVisibility?user_id=${userTelegramId}`);
+      const result = await response.json();
+      
+      if (result.visibility && result.visibility.length === 6) {
+        setVisibleSections(result.visibility); // Expecting [true, false, true, ...]
+      }
+    } catch (error) {
+      console.error("Error fetching section visibility:", error.message);
+    }
+  };
+
+  useEffect(() => {
+    if (userTelegramId) {
+      fetchSectionVisibility();
+    }
+  }, [userTelegramId]);
+  */
+
   // Placeholder data for demo buttons (similar to HomePage)
-  const demoGroups = [
-    
-  ];
+  const demoGroups = [];
 
   // Fetch data from Backend
   const fetchGroups = async (userTelegramId) => {
@@ -146,61 +176,59 @@ const AnalyticsPage = () => {
 
       {/* Group Buttons */}
       <Box
-  sx={{
-    display: "flex",
-    gap: "10px",
-    marginBottom: "20px",
-    overflowX: "auto", // Enables horizontal scrolling
-    whiteSpace: "nowrap", // Prevents buttons from wrapping
-    paddingBottom: "5px", // Adds padding for better spacing
-    scrollbarWidth: "thin", // Adjusts scrollbar width (Firefox)
-    "&::-webkit-scrollbar": {
-      height: "6px", // Adjust scrollbar height (Chrome, Edge, Safari)
-    },
-    "&::-webkit-scrollbar-thumb": {
-      backgroundColor: "#54d5d9", // Custom scrollbar color
-      borderRadius: "3px",
-    },
-  }}
->
-  {(groups && groups.length > 0
-    ? groups.map((group) => ({
-        id: group.group_id,
-        name: group.group_title,
-      }))
-    : demoGroups
-  ).map((group) => (
-    <Button
-      key={group.id}
-      onClick={() => handleGroupClick(group)}
-      sx={{
-        backgroundColor: selectedGroup === group.id ? "#54d5d9" : "#424242",
-        color: "#E0E0E0",
-        padding: "10px 16px",
-        borderRadius: "8px",
-        textTransform: "capitalize",
-        minWidth: "fit-content", // Adjusts to content size
-        maxWidth: "100%", // Prevents excessive stretching
-        height: "auto",
-        fontSize: "1rem",
-        whiteSpace: "normal", // Allows wrapping for long text
-        overflow: "visible", // Ensures text isn't hidden
-        textOverflow: "clip", // Prevents cutting off text
-        display: "inline-flex", // Ensures proper sizing with flex behavior
-        alignItems: "center", // Keeps text centered
-        "&:hover": {
-          backgroundColor: "#54d5d9",
-          color: "#FFFFFF",
-        },
-      }}
-      
-      
-    >
-      {group.name}
-    </Button>
-  ))}
-</Box>
-
+        sx={{
+          display: "flex",
+          gap: "10px",
+          marginBottom: "20px",
+          overflowX: "auto", // Enables horizontal scrolling
+          whiteSpace: "nowrap", // Prevents buttons from wrapping
+          paddingBottom: "5px", // Adds padding for better spacing
+          scrollbarWidth: "thin", // Adjusts scrollbar width (Firefox)
+          "&::-webkit-scrollbar": {
+            height: "6px", // Adjust scrollbar height (Chrome, Edge, Safari)
+          },
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "#54d5d9", // Custom scrollbar color
+            borderRadius: "3px",
+          },
+        }}
+      >
+        {(groups && groups.length > 0
+          ? groups.map((group) => ({
+              id: group.group_id,
+              name: group.group_title,
+            }))
+          : demoGroups
+        ).map((group) => (
+          <Button
+            key={group.id}
+            onClick={() => handleGroupClick(group)}
+            sx={{
+              backgroundColor:
+                selectedGroup === group.id ? "#54d5d9" : "#424242",
+              color: "#E0E0E0",
+              padding: "10px 16px",
+              borderRadius: "8px",
+              textTransform: "capitalize",
+              minWidth: "fit-content", // Adjusts to content size
+              maxWidth: "100%", // Prevents excessive stretching
+              height: "auto",
+              fontSize: "1rem",
+              whiteSpace: "normal", // Allows wrapping for long text
+              overflow: "visible", // Ensures text isn't hidden
+              textOverflow: "clip", // Prevents cutting off text
+              display: "inline-flex", // Ensures proper sizing with flex behavior
+              alignItems: "center", // Keeps text centered
+              "&:hover": {
+                backgroundColor: "#54d5d9",
+                color: "#FFFFFF",
+              },
+            }}
+          >
+            {group.name}
+          </Button>
+        ))}
+      </Box>
 
       {/* Divider Line */}
       <Box
@@ -214,7 +242,8 @@ const AnalyticsPage = () => {
 
       {/* Sections */}
       <Box display="flex" flexDirection="column" marginTop="20px">
-        {items.map((item, index) => (
+      {items.map((item, index) => 
+          visibleSections[index] && ( 
           <Box
             key={index}
             marginBottom="15px"

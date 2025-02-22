@@ -129,7 +129,7 @@ const MemberAnalyticsGraph = ({ groupId }) => {
         </Card> */}
 
         {/* Total Member Activity*/}
-        {/* <Card
+         <Card
           sx={{
             padding: 2,
             height: "200px",
@@ -166,7 +166,7 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <TotalMemberActivityChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card> */}
+        </Card> 
 
         {/*Active vs Inactive Members */}
         <Card
@@ -693,7 +693,7 @@ const MemberAnalyticsGraph = ({ groupId }) => {
         </Card> */}
 
         {/*Repetitive Reactions */}
-        {/* <Card
+         <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -730,7 +730,7 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <RepetitiveReactionsChart2 groupId={groupId} />
             </Box>
           </CardContent>
-        </Card> */}
+        </Card> 
 
         {/*Inactive Periods */}
         {/* <Card
@@ -1019,7 +1019,7 @@ const MemberAnalyticsGraph = ({ groupId }) => {
         </Card>
 
         {/*Overactive Poll/Ticket Creation*/}
-        {/* <Card
+         <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -1057,7 +1057,7 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <PollTicketChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card> */}
+        </Card> 
 
         {/*Members with Warning History*/}
         {/* <Card
