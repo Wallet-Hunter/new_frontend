@@ -20,7 +20,7 @@ const MemberInteractionsChart = ({ groupId }) => {
     "avgForwards",
     "averageInteractions",
   ]);
-  const [chartData, setChartData] = useState([0, 0, 0, 0]); // Default zero values
+  const [chartData, setChartData] = useState([0, 0, 0, 0]);
   const [error, setError] = useState(null);
   const [isDataFetched, setIsDataFetched] = useState(false);
 
@@ -47,23 +47,22 @@ const MemberInteractionsChart = ({ groupId }) => {
         }
 
         const result = await response.json();
-        console.log("API Response:", result); // Debugging log
+        console.log("API Response:", result);
 
-        // Find data for the specific date (2025-02-06)
-        const filteredData = result.find((entry) => entry.date === "2025-02-06");
+        if (result.length > 0) {
+          const latestData = result[result.length - 1]; // Get the latest date entry
 
-        if (filteredData) {
           setChartData([
-            filteredData.avgReplies ?? 0,
-            filteredData.avgMentions ?? 0,
-            filteredData.avgForwards ?? 0,
-            filteredData.averageInteractions ?? 0,
+            latestData.avgReplies ?? 0,
+            latestData.avgMentions ?? 0,
+            latestData.avgForwards ?? 0,
+            latestData.averageInteractions ?? 0,
           ]);
         } else {
-          setChartData([0, 0, 0, 0]); // If no data, ensure all zeroes
+          setChartData([0, 0, 0, 0]);
         }
 
-        setIsDataFetched(true); // Always mark data as fetched
+        setIsDataFetched(true);
       } catch (error) {
         console.error("Error fetching data:", error.message);
         setError("Failed to load data.");

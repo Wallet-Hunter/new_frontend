@@ -9,83 +9,59 @@ import {
   Legend,
 } from "chart.js";
 
-// Register necessary Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 const PostEngagementChart = ({ groupId }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [data, setData] = useState({}); // State to store fetched data
+  const [data, setData] = useState({});
 
-  // Define color schemes for dark and light modes
-  const backgroundColorLight = "#54d5d9";
-  const backgroundColorDark = "#43aaae";
-  const backgroundColorLightShares = "#225557";
-  const backgroundColorDarkShares = "#54d5d9";
-  const backgroundColorLightReactions = "#43aaae";
-  const backgroundColorDarkReactions = "#225557";
-
-  // Fetch engagement data from the backend
   const fetchData = async () => {
     try {
       const response = await fetch(
         `${process.env.REACT_APP_SERVER_URL}/graphs/engagement/postengagement?group_id=${groupId}`
       );
-      
       const result = await response.json();
       
-      // Ensure that null or undefined values are replaced with 0
+      // Transform API response
       setData({
-        postNames: result.postNames || [],
-        replies: result.replies?.map(val => val ?? 0) || [],
-        shares: result.shares?.map(val => val ?? 0) || [],
-        reactions: result.reactions?.map(val => val ?? 0) || [],
+        postIds: result.map(item => item.postId) || [],
+        replies: result.map(item => item.replies ?? 0) || [],
+        views: result.map(item => item.views ?? 0) || [],
+        forwards: result.map(item => item.forwards ?? 0) || [],
       });
-
-      console.log("Data successfully fetched:", result);
     } catch (error) {
       console.error("Error fetching data:", error.message);
     }
   };
 
-  // Detect dark mode preference and fetch data when the component mounts
   useEffect(() => {
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setIsDarkMode(matchMedia.matches);
-
+    
     const handleChange = (e) => setIsDarkMode(e.matches);
     matchMedia.addEventListener("change", handleChange);
 
     fetchData();
-
-    return () => {
-      matchMedia.removeEventListener("change", handleChange);
-    };
+    return () => matchMedia.removeEventListener("change", handleChange);
   }, []);
 
-  // Prepare chart data for rendering
   const chartData = {
-    labels: data.postNames,
+    labels: data.postIds,
     datasets: [
       {
         label: "Replies",
         data: data.replies,
-        backgroundColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
-        borderColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
-        borderWidth: 1,
+        backgroundColor: isDarkMode ? "#43aaae" : "#54d5d9",
       },
       {
-        label: "Shares",
-        data: data.shares,
-        backgroundColor: isDarkMode ? backgroundColorDarkShares : backgroundColorLightShares,
-        borderColor: isDarkMode ? backgroundColorDarkShares : backgroundColorLightShares,
-        borderWidth: 1,
+        label: "Views",
+        data: data.views,
+        backgroundColor: isDarkMode ? "#225557" : "#54d5d9",
       },
       {
-        label: "Reactions",
-        data: data.reactions,
-        backgroundColor: isDarkMode ? backgroundColorDarkReactions : backgroundColorLightReactions,
-        borderColor: isDarkMode ? backgroundColorDarkReactions : backgroundColorLightReactions,
-        borderWidth: 1,
+        label: "Forwards",
+        data: data.forwards,
+        backgroundColor: isDarkMode ? "#54d5d9" : "#43aaae",
       },
     ],
   };
@@ -104,7 +80,7 @@ const PostEngagementChart = ({ groupId }) => {
             },
             plugins: {
               legend: {
-                display: false,
+                display: true,
               },
               tooltip: {
                 callbacks: {
@@ -124,9 +100,6 @@ const PostEngagementChart = ({ groupId }) => {
                 ticks: {
                   color: "white",
                 },
-                grid: {
-                  color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
-                },
               },
               y: {
                 title: {
@@ -138,28 +111,11 @@ const PostEngagementChart = ({ groupId }) => {
                   color: "white",
                 },
                 beginAtZero: true,
-                grid: {
-                  color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
-                },
-              },
-            },
-            elements: {
-              bar: {
-                borderRadius: 10,
-                hoverBackgroundColor: isDarkMode
-                  ? `${backgroundColorDark}CC`
-                  : `${backgroundColorLight}CC`,
               },
             },
           }}
         />
       </div>
-      <style jsx>{`
-        .chart-container:hover .chartjs-render-monitor {
-          transform: scale(1.05);
-          transition: transform 0.3s ease;
-        }
-      `}</style>
     </div>
   );
 };

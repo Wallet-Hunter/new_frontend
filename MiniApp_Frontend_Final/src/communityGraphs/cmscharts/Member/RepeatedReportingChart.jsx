@@ -11,69 +11,53 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-const RepeatedReportingChart = () => {
+const RepeatedReportingChart = ({ groupId }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [chartData, setChartData] = useState({
-    labels: [],
-    datasets: [],
-  });
+  const [chartData, setChartData] = useState({ labels: [], datasets: [] });
 
-  // Function to fetch data dynamically from the backend (currently commented out)
-  // const fetchData = async () => {
-  //   try {
-  //     const response = await fetch(
-  //       "${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/messages?{group_id}",
-  //       {
-  //         method: "GET",
-  //         //credentials: "include", // Include credentials (cookies, etc.)
-  //       }
-  //     );
-
-  //     // Parse the JSON response
-  //     const result = await response.json();
-  //     // Uncomment to set data from the backend
-  //     // setData(result);
-  //     console.log("Data successfully fetched from the backend:");
-  //     console.log(result); // Log the result for debugging
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error.message);
-  //   }
-  // };
+  const fetchData = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/graphs/member/repeatedreporting?group_id=${groupId}`
+      );
+      const result = await response.json();
+      
+      if (result.repeated_reporting) {
+        const labels = result.repeated_reporting.map((entry) => entry.sender_name);
+        const data = result.repeated_reporting.map((entry) => entry.reports_filed);
+        
+        setChartData({
+          labels,
+          datasets: [
+            {
+              label: "Number of Reports Filed",
+              data,
+              backgroundColor: isDarkMode
+                ? "rgba(67, 229, 244, 1)"
+                : "rgba(75, 192, 192, 1)",
+              borderColor: isDarkMode
+                ? "rgba(67, 229, 244, 1)"
+                : "rgba(75, 192, 192, 1)",
+              borderWidth: 1,
+            },
+          ],
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error.message);
+    }
+  };
 
   useEffect(() => {
-    // Dark Mode Detection
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setIsDarkMode(matchMedia.matches);
-
     const handleChange = (e) => setIsDarkMode(e.matches);
     matchMedia.addEventListener("change", handleChange);
 
-    // Commented dynamic data fetching for backend
-    // fetchData();
-
-    // Hardcoded test data
-    const testLabels = ["Member1", "Member2", "Member3", "Member4", "Member5"];
-    const testData = [15, 25, 8, 12, 20];
-
-    setChartData({
-      labels: testLabels,
-      datasets: [
-        {
-          label: "Number of Reports Filed",
-          data: testData,
-          backgroundColor: isDarkMode
-            ? "rgba(67, 229, 244, 1)"
-            : "rgba(75, 192, 192, 1)",
-          borderColor: isDarkMode
-            ? "rgba(67, 229, 244, 1)"
-            : "rgba(75, 192, 192, 1)",
-          borderWidth: 1,
-        },
-      ],
-    });
+    fetchData(); // Fetch data when component mounts
 
     return () => matchMedia.removeEventListener("change", handleChange);
-  }, [isDarkMode]);
+  }, [groupId]);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
@@ -88,45 +72,25 @@ const RepeatedReportingChart = () => {
               easing: "easeOutQuart",
             },
             plugins: {
-              legend: {
-                display: false, // Disable legend
-              },
+              legend: { display: false },
               tooltip: {
                 callbacks: {
-                  label: (tooltipItem) => {
-                    return `Reports Filed: ${tooltipItem.raw}`; // Tooltip shows report count
-                  },
+                  label: (tooltipItem) => `Reports Filed: ${tooltipItem.raw}`,
                 },
               },
             },
             scales: {
               x: {
-                title: {
-                  display: true,
-                  text: "Member IDs", // X-axis title
-                  color: "white",
-                },
-                ticks: {
-                  color: "#fff", // X-axis tick color
-                },
-                grid: {
-                  display: false,
-                },
+                title: { display: true, text: "Members", color: "white" },
+                ticks: { color: "#fff" },
+                grid: { display: false },
               },
               y: {
-                title: {
-                  display: true,
-                  text: "No of Reports Filed", // Y-axis title
-                  color: "white",
-                },
-                ticks: {
-                  color: "#fff", // X-axis tick color
-                },
+                title: { display: true, text: "No of Reports Filed", color: "white" },
+                ticks: { color: "#fff" },
                 beginAtZero: true,
                 grid: {
-                  color: isDarkMode
-                    ? "rgba(220, 220, 220, 0.1)"
-                    : "rgba(0, 0, 0, 0.1)",
+                  color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
                 },
               },
             },
@@ -143,7 +107,7 @@ const RepeatedReportingChart = () => {
       </div>
       <style jsx>{`
         .chart-container:hover .chartjs-render-monitor {
-          transform: scale(1.05); /* Scale the chart on hover */
+          transform: scale(1.05);
           transition: transform 0.3s ease;
         }
       `}</style>

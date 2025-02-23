@@ -11,31 +11,10 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-const GroupRoleMisuseChart = ({
-  memberIds = [], // Member IDs as X-axis labels
-  misuseActivities = [], // Number of misuse activities for each member
-  backgroundColorLight = "rgba(75, 192, 192, 1)",
-  backgroundColorDark = "rgba(67, 229, 244, 1)",
-}) => {
+const GroupRoleMisuseChart = ({ groupId }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
-
-  // Hardcoded data for testing purposes
-  const hardcodedMemberIds = [1, 2, 3, 4];
-  const hardcodedMisuseActivities = [12, 5, 8, 3];
-
-  // Chart data configuration
-  const chartData = {
-    labels: memberIds.length > 0 ? memberIds : hardcodedMemberIds, // Member IDs as X-axis labels
-    datasets: [
-      {
-        label: "Misuse Activities", // Dataset label
-        data: misuseActivities.length > 0 ? misuseActivities : hardcodedMisuseActivities, // Misuse activities count
-        backgroundColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
-        borderColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
-        borderWidth: 1,
-      },
-    ],
-  };
+  const [memberIds, setMemberIds] = useState([]);
+  const [misuseActivities, setMisuseActivities] = useState([]);
 
   useEffect(() => {
     // Detect dark mode preference
@@ -50,27 +29,42 @@ const GroupRoleMisuseChart = ({
     };
   }, []);
 
-  // Fetch dynamic data (commented out for now)
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await fetch("${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/messages?{group_id}", {
-  //         method: "GET",
-  //         //credentials: "include", // Include credentials (cookies, etc.)
-  //       });
-  //
-  //       // Parse the JSON response
-  //       const result = await response.json();
-  //       // setData(hardcodeddData)
-  //       setData(result);
-  //       console.log("Data successfully fetched from the backend:");
-  //       console.log(result); // Log the result for debugging
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error.message);
-  //     }
-  //   };
-  //   fetchData();
-  // }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_SERVER_URL}/graphs/members/grouprolemisuse?group_id=${groupId}`
+        );
+        const result = await response.json();
+
+        if (result.role_misuse) {
+          const ids = result.role_misuse.map((item) => item.sender_id);
+          const misuseCounts = result.role_misuse.map((item) => item.role_misuse);
+          setMemberIds(ids);
+          setMisuseActivities(misuseCounts);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error.message);
+      }
+    };
+
+    if (groupId) {
+      fetchData();
+    }
+  }, [groupId]);
+
+  const chartData = {
+    labels: memberIds,
+    datasets: [
+      {
+        label: "Misuse Activities",
+        data: misuseActivities,
+        backgroundColor: isDarkMode ? "rgba(67, 229, 244, 1)" : "rgba(75, 192, 192, 1)",
+        borderColor: isDarkMode ? "rgba(67, 229, 244, 1)" : "rgba(75, 192, 192, 1)",
+        borderWidth: 1,
+      },
+    ],
+  };
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
@@ -86,12 +80,12 @@ const GroupRoleMisuseChart = ({
             },
             plugins: {
               legend: {
-                display: false, // Disable legend
+                display: false,
               },
               tooltip: {
                 callbacks: {
                   label: (tooltipItem) => {
-                    return `Misuse Activities: ${tooltipItem.raw}`; // Tooltip shows misuse activity count
+                    return `Misuse Activities: ${tooltipItem.raw}`;
                   },
                 },
               },
@@ -100,7 +94,7 @@ const GroupRoleMisuseChart = ({
               x: {
                 title: {
                   display: true,
-                  text: "Member ID", // X-axis title (Member ID)
+                  text: "Member ID",
                   color: "white",
                 },
                 ticks: {
@@ -113,7 +107,7 @@ const GroupRoleMisuseChart = ({
               y: {
                 title: {
                   display: true,
-                  text: "Number of Misuse Activities", // Y-axis title
+                  text: "Number of Misuse Activities",
                   color: "white",
                 },
                 ticks: {
@@ -121,21 +115,13 @@ const GroupRoleMisuseChart = ({
                 },
                 beginAtZero: true,
                 grid: {
-                  color: isDarkMode
-                    ? "rgba(220, 220, 220, 0.1)"
-                    : "rgba(0, 0, 0, 0.1)",
+                  color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
                 },
               },
             },
             elements: {
               bar: {
                 borderRadius: 10,
-                backgroundColor: isDarkMode
-                  ? backgroundColorDark
-                  : backgroundColorLight,
-                hoverBackgroundColor: isDarkMode
-                  ? `${backgroundColorDark}CC`
-                  : `${backgroundColorLight}CC`,
               },
             },
           }}
@@ -143,7 +129,7 @@ const GroupRoleMisuseChart = ({
       </div>
       <style jsx>{`
         .chart-container:hover .chartjs-render-monitor {
-          transform: scale(1.05); /* Scale the chart on hover */
+          transform: scale(1.05);
           transition: transform 0.3s ease;
         }
       `}</style>

@@ -11,7 +11,7 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-const WarningHistoryChart = ({groupId}) => {
+const WarningHistoryChart = ({ groupId }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [chartData, setChartData] = useState({
     labels: [],
@@ -26,24 +26,29 @@ const WarningHistoryChart = ({groupId}) => {
     const handleChange = (e) => setIsDarkMode(e.matches);
     matchMedia.addEventListener("change", handleChange);
 
-    // Fetch data from Backend (commented out for now)
+    // Fetch data from backend API
     const fetchData = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/messages?group_id =${groupId}`, {
-          method: "GET",
-          //credentials: "include", // Include credentials (cookies, etc.)
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_SERVER_URL}/graphs/members/memberswithwarnings?group_id=${groupId}`
+        );
 
-        // Parse the JSON response
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
         const result = await response.json();
-        console.log("Data successfully fetched from the backend:");
-        console.log(result); // Log the result for debugging
+        console.log("Fetched Data:", result);
 
-        // Assuming the result is an array of objects with `member` and `warningCount`
-        const warningLabels = result.map(item => item.member);
-        const warningCounts = result.map(item => item.warningCount);
+        // Extract data correctly
+        const warningLabels = result.members_with_warnings.map(
+          (item) => item.sender_name
+        );
+        const warningCounts = result.members_with_warnings.map(
+          (item) => item.warning_count
+        );
 
-        // Set chart data using fetched data
+        // Set chart data
         setChartData({
           labels: warningLabels,
           datasets: [
@@ -65,36 +70,10 @@ const WarningHistoryChart = ({groupId}) => {
       }
     };
 
-    // Hardcoded test data for "Members with Warning History"
-    const warningLabels = [
-      "Member1",
-      "Member2",
-      "Member3",
-      "Member4",
-      "Member5",
-    ];
-    const warningCounts = [3, 7, 5, 2, 8]; // Warnings count
-
-    // Set chart data using hardcoded data
-    setChartData({
-      labels: warningLabels,
-      datasets: [
-        {
-          label: "Number of Warnings Received",
-          data: warningCounts,
-          backgroundColor: isDarkMode
-            ? "rgba(67, 229, 244, 1)" // Dark mode: Blue tone
-            : "rgba(75, 192, 192, 1)", // Light mode: Green tone
-          borderColor: isDarkMode
-            ? "rgba(67, 229, 244, 1)"
-            : "rgba(75, 192, 192, 1)",
-          borderWidth: 1,
-        },
-      ],
-    });
+    fetchData();
 
     return () => matchMedia.removeEventListener("change", handleChange);
-  }, [groupId]);
+  }, [groupId, isDarkMode]);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
@@ -124,11 +103,11 @@ const WarningHistoryChart = ({groupId}) => {
               x: {
                 title: {
                   display: true,
-                  text: "Member IDs", // X-axis title
-                  color: "white",
+                  text: "Members", // X-axis title
+                  color: isDarkMode ? "white" : "black",
                 },
                 ticks: {
-                  color: "white",
+                  color: isDarkMode ? "white" : "black",
                 },
                 grid: {
                   display: false,
@@ -138,10 +117,10 @@ const WarningHistoryChart = ({groupId}) => {
                 title: {
                   display: true,
                   text: "No of Warnings Received", // Y-axis title
-                  color: "white",
+                  color: isDarkMode ? "white" : "black",
                 },
                 ticks: {
-                  color: "white",
+                  color: isDarkMode ? "white" : "black",
                 },
                 beginAtZero: true,
                 grid: {

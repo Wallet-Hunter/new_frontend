@@ -12,63 +12,47 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 const OffensiveContentChart = ({
-  memberIDs = [],
-  offensiveCounts = [],
+  groupId,
   backgroundColorLight = "rgba(75, 192, 192, 1)",
   backgroundColorDark = "rgba(67, 229, 244, 1)",
 }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [data, setData] = useState({ memberIDs: [], offensiveCounts: [] });
+  const [data, setData] = useState({ memberNames: [], offensiveCounts: [] });
 
   // Fetch data from Backend
   const fetchData = async () => {
     try {
       const response = await fetch(
-        '${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/messages?group_id=${group_id}',
-        {
-          method: "GET",
-          //credentials: "include", // Include credentials (cookies, etc.)
-        }
+        `${process.env.REACT_APP_SERVER_URL}/graphs/member/offensivecontentrepeaters?group_id=${groupId}`
       );
-
-      // Parse the JSON response
       const result = await response.json();
-      // Uncomment below line to use fetched data
-      // setData(result);
-
-      console.log("Data successfully fetched from the backend:");
-      console.log(result); // Log the result for debugging
+      
+      if (result.offensive_content_repeaters) {
+        const memberNames = result.offensive_content_repeaters.map((item) => item.sender_name);
+        const offensiveCounts = result.offensive_content_repeaters.map((item) => item.offensive_posts);
+        setData({ memberNames, offensiveCounts });
+      }
     } catch (error) {
       console.error("Error fetching data:", error.message);
     }
   };
 
   useEffect(() => {
-    // Detect dark mode preference
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setIsDarkMode(matchMedia.matches);
-
     const handleChange = (e) => setIsDarkMode(e.matches);
     matchMedia.addEventListener("change", handleChange);
-
-    // Fetch data (commented out for now)
-    // fetchData();
-
-    // For testing, using hardcoded data
-    const hardcodedData = {
-      memberIDs: ["Member 1", "Member 2", "Member 3"],
-      offensiveCounts: [5, 10, 3],
-    };
-    setData(hardcodedData); // Set hardcoded data
+    
+    fetchData();
 
     return () => {
       matchMedia.removeEventListener("change", handleChange);
     };
-  }, []);
+  }, [groupId]);
 
   // Chart data configuration
   const chartData = {
-    labels: data.memberIDs,
+    labels: data.memberNames,
     datasets: [
       {
         label: "Offensive Posts",
@@ -81,14 +65,7 @@ const OffensiveContentChart = ({
   };
 
   return (
-    <div
-      style={{
-        position: "relative",
-        width: "100%",
-        height: "100%",
-        backgroundColor: "#171717",
-      }}
-    >
+    <div style={{ position: "relative", width: "100%", height: "100%", backgroundColor: "#171717" }}>
       <div style={{ width: "100%", height: "90%" }} className="chart-container">
         <Bar
           data={chartData}
@@ -100,57 +77,31 @@ const OffensiveContentChart = ({
               easing: "easeOutQuart",
             },
             plugins: {
-              legend: {
-                display: false,
-              },
+              legend: { display: false },
               tooltip: {
                 callbacks: {
-                  label: (tooltipItem) => {
-                    return `Offensive Posts: ${tooltipItem.raw}`;
-                  },
+                  label: (tooltipItem) => `Offensive Posts: ${tooltipItem.raw}`,
                 },
               },
             },
             scales: {
               x: {
-                title: {
-                  display: true,
-                  text: "Member ID",
-                  color: "white",
-                },
-                ticks: {
-                  color: "#fff",
-                },
-                grid: {
-                  display: false,
-                },
+                title: { display: true, text: "Member Name", color: "white" },
+                ticks: { color: "#fff" },
+                grid: { display: false },
               },
               y: {
-                title: {
-                  display: true,
-                  text: "Offensive Posts",
-                  color: "white",
-                },
-                ticks: {
-                  color: "#fff",
-                },
+                title: { display: true, text: "Offensive Posts", color: "white" },
+                ticks: { color: "#fff" },
                 beginAtZero: true,
-                grid: {
-                  color: isDarkMode
-                    ? "rgba(220, 220, 220, 0.1)"
-                    : "rgba(0, 0, 0, 0.1)",
-                },
+                grid: { color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)" },
               },
             },
             elements: {
               bar: {
                 borderRadius: 10,
-                backgroundColor: isDarkMode
-                  ? backgroundColorDark
-                  : backgroundColorLight,
-                hoverBackgroundColor: isDarkMode
-                  ? `${backgroundColorDark}CC`
-                  : `${backgroundColorLight}CC`,
+                backgroundColor: isDarkMode ? backgroundColorDark : backgroundColorLight,
+                hoverBackgroundColor: isDarkMode ? `${backgroundColorDark}CC` : `${backgroundColorLight}CC`,
               },
             },
           }}

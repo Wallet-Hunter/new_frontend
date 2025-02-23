@@ -10,24 +10,26 @@ import {
 } from "recharts";
 import styled from "styled-components";
 
-const DisruptiveBehaviorChart = () => {
+const DisruptiveBehaviorChart = ({ groupId }) => {
   const [theme, setTheme] = useState("light");
   const [data, setData] = useState([]);
 
   // Function to fetch data from Backend
   const fetchData = async () => {
     try {
-      const response = await fetch('${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/messages?group_id=${group_id}', {
-        method: "GET",
-        //credentials: "include", // Include credentials (cookies, etc.)
-      });
-
-      // Parse the JSON response
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/graphs/members/disruptivebehaviour?group_id=${groupId}`
+      );
       const result = await response.json();
-      //setData(hardcodeddData)
-      setData(result);
-      console.log("Data successfully fetched from the backend:");
-      console.log(result); // Log the result for debugging
+      
+      if (result?.disruptive_behavior) {
+        // Transform backend data to match frontend format
+        const transformedData = result.disruptive_behavior.map((item) => ({
+          member_id: item.sender_name, // Using sender_name as the X-axis label
+          disruptive_behavior: item.disruptive_behavior, // Y-axis value
+        }));
+        setData(transformedData);
+      }
     } catch (error) {
       console.error("Error fetching data:", error.message);
     }
@@ -45,27 +47,12 @@ const DisruptiveBehaviorChart = () => {
     matchMedia.addEventListener("change", handleThemeChange);
 
     // Fetch data when the component mounts
-    // fetchData(); // Uncomment this line when ready to fetch data from the backend
-
-    // For testing, use hardcoded data for disruptive behavior levels
-    const testData = [
-      { member_id: "M001", disruptive_behavior: 5 },
-      { member_id: "M002", disruptive_behavior: 2 },
-      { member_id: "M003", disruptive_behavior: 8 },
-      { member_id: "M004", disruptive_behavior: 3 },
-      { member_id: "M005", disruptive_behavior: 6 },
-      { member_id: "M006", disruptive_behavior: 7 },
-      { member_id: "M007", disruptive_behavior: 4 },
-      { member_id: "M008", disruptive_behavior: 9 },
-      { member_id: "M009", disruptive_behavior: 1 },
-      { member_id: "M010", disruptive_behavior: 2 },
-    ];
-    setData(testData); // Set the test data for disruptive behavior levels
+    fetchData();
 
     return () => {
       matchMedia.removeEventListener("change", handleThemeChange);
     };
-  }, []);
+  }, [groupId]);
 
   return (
     <ChartContainer className={theme}>
@@ -75,7 +62,7 @@ const DisruptiveBehaviorChart = () => {
           <XAxis
             dataKey="member_id"
             label={{
-              value: "Member IDs",
+              value: "Members",
               position: "insideBottomRight",
               offset: -5,
               style: { fill: "white", fontSize: "12px" },
@@ -84,7 +71,7 @@ const DisruptiveBehaviorChart = () => {
           />
           <YAxis
             label={{
-              value: "Disruptive Behavior (e.g., trolling, arguing)",
+              value: "Disruptive Behavior Level",
               dy: 60,
               angle: -90,
               position: "insideLeft",

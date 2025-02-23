@@ -10,19 +10,11 @@ import {
 } from "recharts";
 import styled from "styled-components";
 
-const DropOffLineChart = () => {
+const DropOffLineChart = ({ groupId }) => {
   const [theme, setTheme] = useState("light");
-  const [data, setData] = useState([
-    // Hardcoded data for testing
-    { memberId: "M001", participationLevel: 90 },
-    { memberId: "M002", participationLevel: 70 },
-    { memberId: "M003", participationLevel: 50 },
-    { memberId: "M004", participationLevel: 30 },
-    { memberId: "M005", participationLevel: 10 },
-  ]);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    // Set theme based on system preference
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setTheme(matchMedia.matches ? "dark" : "light");
 
@@ -32,50 +24,55 @@ const DropOffLineChart = () => {
 
     matchMedia.addEventListener("change", handleThemeChange);
 
-    // Fetch data from Backend (currently commented for testing)
-    /*
     const fetchData = async () => {
       try {
-        const response = await fetch('${process.env.REACT_APP_SERVER_URL}/graphs/member/messages?group_id=${group_id}', {
-          method: "GET",
-          //credentials: "include", // Include credentials (cookies, etc.)
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_SERVER_URL}/graphs/member/dropoffmembers?group_id=${groupId}`
+        );
 
-        // Parse the JSON response
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
         const result = await response.json();
-        //setData(hardcodeddData)
-        setData(result);
-        console.log("Data successfully fetched from the backend:");
-        console.log(result); // Log the result for debugging
+
+        // Transform API response into chart-compatible format
+        const formattedData = result.drop_off_members.map((member) => ({
+          memberName: member.sender_name,
+          dropOffPeriods: member.drop_off_periods,
+        }));
+
+        setData(formattedData);
       } catch (error) {
         console.error("Error fetching data:", error.message);
       }
     };
 
     fetchData();
-    */
 
     return () => {
       matchMedia.removeEventListener("change", handleThemeChange);
     };
-  }, []);
+  }, [groupId]);
 
   return (
     <ChartContainer className={theme}>
       <ResponsiveContainer width="100%" height="90%">
-        <RechartsLineChart
-          data={data}
-          //margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
-        >
+        <RechartsLineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" />
           <XAxis
-            dataKey="memberId"
-            label={{ value: "Member IDs", position: "insideBottomRight", style: { fill: "white", fontSize: "12px" }, offset: -5 }}
+            dataKey="memberName"
+            label={{
+              value: "Members",
+              position: "insideBottomRight",
+              style: { fill: "white", fontSize: "12px" },
+              offset: -5,
+            }}
             tick={{ fill: "var(--axis-color)", fontSize: "0.8em" }}
           />
           <YAxis
             label={{
-              value: "Participation",
+              value: "Drop-Off Periods",
               angle: -90,
               position: "insideLeft",
               offset: 5,
@@ -96,7 +93,7 @@ const DropOffLineChart = () => {
           />
           <Line
             type="monotone"
-            dataKey="participationLevel"
+            dataKey="dropOffPeriods"
             stroke="var(--line-color)"
             strokeWidth={2}
             dot={{ r: 4, fill: "var(--line-color)" }}

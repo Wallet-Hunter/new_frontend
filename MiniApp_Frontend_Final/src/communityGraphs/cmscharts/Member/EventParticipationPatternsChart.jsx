@@ -11,67 +11,88 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-const EventParticipationPatternsChart = () => {
+const EventParticipationPatternsChart = ({ groupId }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [chartData, setChartData] = useState({
     labels: [],
     datasets: [],
   });
 
-  // Function to fetch data dynamically from Backend (currently commented out)
-  /*
+  // Function to fetch data dynamically from Backend
   const fetchData = async () => {
     try {
-      const response = await fetch("${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/messages?{group_id}", {
-        method: "GET",
-        //credentials: "include", // Include credentials (cookies, etc.)
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/graphs/members/eventparticipation?group_id=${groupId}`,
+        {
+          method: "GET",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+
+      const result = await response.json();
+
+      // Extracting data from API response
+      const labels = result.event_participation.map((item) => item.sender_name);
+      const data = result.event_participation.map(
+        (item) => item.total_event_participation
+      );
+
+      setChartData({
+        labels: labels,
+        datasets: [
+          {
+            label: "Number of Events Participated",
+            data: data,
+            backgroundColor: isDarkMode
+              ? "rgba(67, 229, 244, 1)"
+              : "rgba(75, 192, 192, 1)",
+            borderColor: isDarkMode
+              ? "rgba(67, 229, 244, 1)"
+              : "rgba(75, 192, 192, 1)",
+            borderWidth: 1,
+          },
+        ],
       });
 
-      // Parse the JSON response
-      const result = await response.json();
-      setChartData(result); // Set the data fetched from the backend
-      console.log("Data successfully fetched from the backend:");
-      console.log(result); // Log the result for debugging
+      console.log("Data successfully fetched from the backend:", result);
     } catch (error) {
       console.error("Error fetching data:", error.message);
+
+      // Default test data in case of an error
+      setChartData({
+        labels: ["Member1", "Member2", "Member3", "Member4", "Member5"],
+        datasets: [
+          {
+            label: "Number of Events Participated",
+            data: [3, 7, 5, 2, 4],
+            backgroundColor: isDarkMode
+              ? "rgba(67, 229, 244, 1)"
+              : "rgba(75, 192, 192, 1)",
+            borderColor: isDarkMode
+              ? "rgba(67, 229, 244, 1)"
+              : "rgba(75, 192, 192, 1)",
+            borderWidth: 1,
+          },
+        ],
+      });
     }
   };
-  */
 
   useEffect(() => {
-    // Dark Mode Detection
+    // Detect Dark Mode
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setIsDarkMode(matchMedia.matches);
 
     const handleChange = (e) => setIsDarkMode(e.matches);
     matchMedia.addEventListener("change", handleChange);
 
-    // Commented dynamic data fetching for Backend
-    // fetchData();
-
-    // Hardcoded test data for Event Participation Patterns
-    const testLabels = ["Member1", "Member2", "Member3", "Member4", "Member5"];
-    const testData = [3, 7, 5, 2, 4]; // Number of events participated in
-
-    setChartData({
-      labels: testLabels,
-      datasets: [
-        {
-          label: "Number of Events Participated", // Updated label
-          data: testData,
-          backgroundColor: isDarkMode
-            ? "rgba(67, 229, 244, 1)"
-            : "rgba(75, 192, 192, 1)",
-          borderColor: isDarkMode
-            ? "rgba(67, 229, 244, 1)"
-            : "rgba(75, 192, 192, 1)",
-          borderWidth: 1,
-        },
-      ],
-    });
+    fetchData(); // Fetch data from backend
 
     return () => matchMedia.removeEventListener("change", handleChange);
-  }, [isDarkMode]);
+  }, [groupId, isDarkMode]);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
@@ -92,7 +113,7 @@ const EventParticipationPatternsChart = () => {
               tooltip: {
                 callbacks: {
                   label: (tooltipItem) => {
-                    return `Events Participated: ${tooltipItem.raw}`; // Tooltip shows event count
+                    return `Events Participated: ${tooltipItem.raw}`;
                   },
                 },
               },
@@ -101,11 +122,11 @@ const EventParticipationPatternsChart = () => {
               x: {
                 title: {
                   display: true,
-                  text: "Member IDs", // X-axis title updated
-                  color:"white"
+                  text: "Member Names",
+                  color: "white",
                 },
-                ticks:{
-                  color:"white"
+                ticks: {
+                  color: "white",
                 },
                 grid: {
                   display: false,
@@ -114,11 +135,11 @@ const EventParticipationPatternsChart = () => {
               y: {
                 title: {
                   display: true,
-                  text: "No of Participated", // Y-axis title updated
-                  color:"white"
+                  text: "No. of Participated Events",
+                  color: "white",
                 },
-                ticks:{
-                  color:"white"
+                ticks: {
+                  color: "white",
                 },
                 beginAtZero: true,
                 grid: {
@@ -141,7 +162,7 @@ const EventParticipationPatternsChart = () => {
       </div>
       <style jsx>{`
         .chart-container:hover .chartjs-render-monitor {
-          transform: scale(1.05); /* Scale the chart on hover */
+          transform: scale(1.05);
           transition: transform 0.3s ease;
         }
       `}</style>

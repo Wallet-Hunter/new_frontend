@@ -10,20 +10,28 @@ import {
 } from "recharts";
 import styled from "styled-components";
 
-const GrowthLineChart = () => {
+const GrowthLineChart = ({ groupId }) => {
   const [theme, setTheme] = useState("light");
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Function to fetch data dynamically (e.g., from BigQuery)
-  // const fetchDataFromBigQuery = async () => {
-  //   try {
-  //     const response = await fetch("${process.env.REACT_APP_SERVER_URL}/graphs/member/growthlinechart?group_id=${group_id}"); // Replace with your actual API endpoint
-  //     const jsonData = await response.json();
-  //     setData(jsonData); // Assuming the API returns data in the required format
-  //   } catch (error) {
-  //     console.error("Error fetching data from BigQuery:", error);
-  //   }
-  // };
+  // Function to fetch data from the backend
+  const fetchData = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/graphs/member/growthlinechart?group_id=${groupId}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      const jsonData = await response.json();
+      setData(jsonData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Set theme based on system preferences
@@ -36,29 +44,21 @@ const GrowthLineChart = () => {
 
     matchMedia.addEventListener("change", handleThemeChange);
 
-    // Load hardcoded data for testing
-    const hardcodedData = [
-      { period: "1d", growth: 120 },
-      { period: "7d", growth: 850 },
-      { period: "30d", growth: 3400 },
-    ];
-    setData(hardcodedData);
-
-    // Uncomment the following line to fetch data dynamically
-    // fetchDataFromBigQuery();
+    fetchData();
 
     return () => {
       matchMedia.removeEventListener("change", handleThemeChange);
     };
-  }, []);
+  }, [groupId]);
+
+  if (loading) {
+    return <LoadingMessage>Loading data...</LoadingMessage>;
+  }
 
   return (
     <ChartContainer className={theme}>
       <ResponsiveContainer width="100%" height="90%">
-        <RechartsLineChart
-          data={data}
-          // margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
-        >
+        <RechartsLineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" />
           <XAxis
             dataKey="period"
@@ -66,7 +66,7 @@ const GrowthLineChart = () => {
               value: "Time Period",
               position: "insideBottomRight",
               offset: -5,
-              style: { fill: "white",fontSize: "12px" },
+              style: { fill: "white", fontSize: "12px" },
             }}
             tick={{ fill: "var(--axis-color)", fontSize: "0.8em" }}
           />
@@ -76,12 +76,10 @@ const GrowthLineChart = () => {
               angle: -90,
               position: "insideLeft",
               offset: 5,
-              style: { fill: "white" , fontSize: "12px"}, // Set the label color to white
-
+              style: { fill: "white", fontSize: "12px" },
             }}
             tick={{ fill: "var(--axis-color)", fontSize: "0.8em" }}
           />
-
           <Tooltip
             cursor={{ fill: "rgba(255, 255, 255, 0.92)" }}
             contentStyle={{
@@ -107,7 +105,6 @@ const GrowthLineChart = () => {
   );
 };
 
-// Styled components for LineChart
 const ChartContainer = styled.div`
   width: 100%;
   height: 100%;
@@ -149,6 +146,13 @@ const Style = styled.div`
       stroke-dashoffset: 0;
     }
   }
+`;
+
+const LoadingMessage = styled.div`
+  color: white;
+  font-size: 1.2em;
+  text-align: center;
+  padding: 20px;
 `;
 
 export default GrowthLineChart;

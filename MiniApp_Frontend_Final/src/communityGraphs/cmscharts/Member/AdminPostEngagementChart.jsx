@@ -11,69 +11,56 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-const AdminPostEngagementChart = () => {
+const AdminPostEngagementChart = ({ groupId }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [chartData, setChartData] = useState({
-    labels: [],
-    datasets: [],
-  });
+  const [chartData, setChartData] = useState({ labels: [], datasets: [] });
 
-  // Function to fetch data from the backend (currently commented out)
-  // const fetchData = async () => {
-  //   try {
-  //     const response = await fetch('${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/messages?group_id=${group_id}', {
-  //       method: "GET",
-  //       //credentials: "include", // Include credentials (cookies, etc.)
-  //     });
-  //
-  //     // Parse the JSON response
-  //     const result = await response.json();
-  //     //setData(hardcodeddData)
-  //     setData(result);
-  //     console.log("Data successfully fetched from the backend:");
-  //     console.log(result); // Log the result for debugging
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error.message);
-  //   }
-  // };
+  // Function to fetch data from the backend
+  const fetchData = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/graphs/members/adminengagement?group_id=${groupId}`
+      );
+      const result = await response.json();
+      console.log("Data successfully fetched from the backend:", result);
+      
+      if (result.admin_engagement) {
+        const labels = result.admin_engagement.map((entry) => entry.sender_name);
+        const dataValues = result.admin_engagement.map((entry) => entry.admin_engagement);
+
+        setChartData({
+          labels,
+          datasets: [
+            {
+              label: "Number of Admin Posts Engaged With",
+              data: dataValues,
+              backgroundColor: isDarkMode
+                ? "rgba(67, 229, 244, 1)"
+                : "rgba(75, 192, 192, 1)",
+              borderColor: isDarkMode
+                ? "rgba(67, 229, 244, 1)"
+                : "rgba(75, 192, 192, 1)",
+              borderWidth: 1,
+            },
+          ],
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error.message);
+    }
+  };
 
   useEffect(() => {
-    // Detect system dark mode preference
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setIsDarkMode(matchMedia.matches);
 
     const handleChange = (e) => setIsDarkMode(e.matches);
     matchMedia.addEventListener("change", handleChange);
 
-    // Commented dynamic data fetching for BigQuery
-    // fetchDataFromBigQuery();
-
-    // Commented fetching data from the backend
-    // fetchData();
-
-    // Hardcoded test data
-    const testLabels = ["Member1", "Member2", "Member3", "Member4", "Member5"];
-    const testData = [10, 20, 15, 8, 25]; // Admin posts engaged with
-
-    setChartData({
-      labels: testLabels,
-      datasets: [
-        {
-          label: "Number of Admin Posts Engaged With",
-          data: testData,
-          backgroundColor: isDarkMode
-            ? "rgba(67, 229, 244, 1)"
-            : "rgba(75, 192, 192, 1)",
-          borderColor: isDarkMode
-            ? "rgba(67, 229, 244, 1)"
-            : "rgba(75, 192, 192, 1)",
-          borderWidth: 1,
-        },
-      ],
-    });
+    fetchData();
 
     return () => matchMedia.removeEventListener("change", handleChange);
-  }, [isDarkMode]);
+  }, [groupId]);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
@@ -88,45 +75,25 @@ const AdminPostEngagementChart = () => {
               easing: "easeOutQuart",
             },
             plugins: {
-              legend: {
-                display: false, // Hide legend
-              },
+              legend: { display: false },
               tooltip: {
                 callbacks: {
-                  label: (tooltipItem) => {
-                    return `Engagements: ${tooltipItem.raw}`; // Tooltip displays counts
-                  },
+                  label: (tooltipItem) => `Engagements: ${tooltipItem.raw}`,
                 },
               },
             },
             scales: {
               x: {
-                title: {
-                  display: true,
-                  text: "Member IDs", // X-axis title
-                  color: "white",
-                },
-                ticks: {
-                  color: "#fff", // X-axis tick color
-                },
-                grid: {
-                  display: false,
-                },
+                title: { display: true, text: "Member Name", color: "white" },
+                ticks: { color: "#fff" },
+                grid: { display: false },
               },
               y: {
-                title: {
-                  display: true,
-                  text: "No of Admin Posts", // Y-axis title
-                  color: "white",
-                },
-                ticks: {
-                  color: "#fff", // X-axis tick color
-                },
+                title: { display: true, text: "No of Admin Posts", color: "white" },
+                ticks: { color: "#fff" },
                 beginAtZero: true,
                 grid: {
-                  color: isDarkMode
-                    ? "rgba(220, 220, 220, 0.1)"
-                    : "rgba(0, 0, 0, 0.1)",
+                  color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
                 },
               },
             },
@@ -143,7 +110,7 @@ const AdminPostEngagementChart = () => {
       </div>
       <style jsx>{`
         .chart-container:hover .chartjs-render-monitor {
-          transform: scale(1.05); /* Scale on hover */
+          transform: scale(1.05);
           transition: transform 0.3s ease;
         }
       `}</style>

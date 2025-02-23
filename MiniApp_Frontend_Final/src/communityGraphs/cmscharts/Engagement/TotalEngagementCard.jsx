@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, Typography } from '@mui/material';
+import { Card, CardContent, Typography, CircularProgress } from '@mui/material';
 
 const TotalEngagementsCard = ({ groupId }) => {
-  const [totalEngagement, setTotalEngagement] = useState(0); // Default to 0 instead of null
-  const [loading, setLoading] = useState(true); // Track loading state
+  const [totalEngagement, setTotalEngagement] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDataFromBigQuery = async () => {
-      setLoading(true); // Set loading state before fetching new data
+      setLoading(true);
 
       try {
         const response = await fetch(
@@ -22,17 +22,21 @@ const TotalEngagementsCard = ({ groupId }) => {
         }
 
         const data = await response.json();
-        setTotalEngagement(data.totalEngagement || 0); // If data is null, default to 0
+        if (data && typeof data.totalEngagement === 'number') {
+          setTotalEngagement(data.totalEngagement);
+        } else {
+          setTotalEngagement(0);
+        }
       } catch (error) {
         console.error('Error fetching data from BigQuery:', error);
-        setTotalEngagement(0); // Set 0 in case of an error
+        setTotalEngagement(0);
       } finally {
-        setLoading(false); // Stop loading after fetching
+        setLoading(false);
       }
     };
 
     fetchDataFromBigQuery();
-  }, [groupId]); // Refetch data when groupId changes
+  }, [groupId]);
 
   return (
     <Card
@@ -41,15 +45,22 @@ const TotalEngagementsCard = ({ groupId }) => {
         padding: 2,
         backgroundColor: 'transparent',
         color: 'blue.500',
-        transition: 'opacity 0.5s ease-in-out', // Smooth transition effect
-        opacity: loading ? 0.5 : 1, // Fade effect while loading
+        transition: 'opacity 0.5s ease-in-out',
+        opacity: loading ? 0.5 : 1,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        textAlign: 'center',
       }}
     >
       <CardContent>
-       
-        <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: 'white' }}>
-          {totalEngagement.toLocaleString()} {/* Format number with commas */}
-        </Typography>
+        {loading ? (
+          <CircularProgress color="inherit" />
+        ) : (
+          <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: 'white' }}>
+            {totalEngagement.toLocaleString()}
+          </Typography>
+        )}
       </CardContent>
     </Card>
   );

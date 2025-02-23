@@ -10,40 +10,31 @@ import {
 } from "recharts";
 import styled from "styled-components";
 
-const NotificationOverloadChart = () => {
+const NotificationOverloadChart = ({ groupId }) => {
   const [theme, setTheme] = useState("light");
-  const [data, setData] = useState([
-    // Hardcoded data for testing
-    { notifications: 10, members: 50 },
-    { notifications: 20, members: 60 },
-    { notifications: 30, members: 40 },
-    { notifications: 40, members: 80 },
-    { notifications: 50, members: 100 },
-  ]);
+  const [data, setData] = useState([]);
 
-  // Fetch data from Backend (currently commented out)
-  /*
   const fetchData = async () => {
     try {
-      const response = await fetch("${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/messages?{group_id}", {
-        method: "GET",
-        //credentials: "include", // Include credentials (cookies, etc.)
-      });
-
-      // Parse the JSON response
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/graphs/members/notificationoverload?group_id=${groupId}`
+      );
       const result = await response.json();
-      // setData(hardcodedData) - Uncomment this line when you want to update data with the fetched data
-      setData(result);
-      console.log("Data successfully fetched from the backend:");
-      console.log(result); // Log the result for debugging
+      
+      // Transform API response into the expected format
+      const formattedData = result.notification_overload.map((entry) => ({
+        notifications: entry.notification_count,
+        members: entry.number_of_members,
+      }));
+
+      setData(formattedData);
+      console.log("Data successfully fetched:", formattedData);
     } catch (error) {
       console.error("Error fetching data:", error.message);
     }
   };
-  */
 
   useEffect(() => {
-    // Set theme based on system preference
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setTheme(matchMedia.matches ? "dark" : "light");
 
@@ -52,23 +43,26 @@ const NotificationOverloadChart = () => {
     };
 
     matchMedia.addEventListener("change", handleThemeChange);
+    fetchData();
 
     return () => {
       matchMedia.removeEventListener("change", handleThemeChange);
     };
-  }, []);
+  }, [groupId]);
 
   return (
     <ChartContainer className={theme}>
       <ResponsiveContainer width="100%" height="90%">
-        <RechartsLineChart
-          data={data}
-          //margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
-        >
+        <RechartsLineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" />
           <XAxis
             dataKey="notifications"
-            label={{ value: "Number of Notifications", position: "insideBottomRight", style: { fill: "white", fontSize: "12px" }, offset: -5 }}
+            label={{
+              value: "Number of Notifications",
+              position: "insideBottomRight",
+              style: { fill: "white", fontSize: "12px" },
+              offset: -5,
+            }}
             tick={{ fill: "var(--axis-color)", fontSize: "0.8em" }}
           />
           <YAxis
@@ -107,7 +101,6 @@ const NotificationOverloadChart = () => {
   );
 };
 
-// Styled components for LineChart
 const ChartContainer = styled.div`
   width: 100%;
   height: 100%;

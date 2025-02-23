@@ -10,44 +10,33 @@ import {
 } from "recharts";
 import styled from "styled-components";
 
-const MemberChurnRateChart = () => {
+const MemberChurnRateChart = ({ groupId }) => {
   const [theme, setTheme] = useState("light");
-  const [data, setData] = useState([
-    // Example hardcoded data for testing
-    { time: "January", retention: 100 },
-    { time: "February", retention: 90 },
-    { time: "March", retention: 85 },
-    { time: "April", retention: 80 },
-    { time: "May", retention: 75 },
-    { time: "June", retention: 70 },
-  ]);
+  const [data, setData] = useState([]);
 
-  // Uncomment and modify the following code to fetch data dynamically from the backend
-  /*
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/messages?{group_id}", {
-          method: "GET",
-          //credentials: "include", // Include credentials (cookies, etc.)
-        });
-
-        // Parse the JSON response
+        const response = await fetch(
+          `${process.env.REACT_APP_SERVER_URL}/graphs/members/memberchurnrate?group_id=${groupId}`
+        );
         const result = await response.json();
-        // Set the fetched data
-        setData(result);
-        console.log("Data successfully fetched from the backend:");
-        console.log(result); // Log the result for debugging
+        
+        if (result.churn_rate) {
+          const formattedData = result.churn_rate.map(entry => ({
+            time: entry.churn_date, // Using churn_date for X-axis
+            retention: entry.retained_members, // Using retained_members for Y-axis
+          }));
+          setData(formattedData);
+        }
       } catch (error) {
         console.error("Error fetching data:", error.message);
       }
     };
     fetchData();
-  }, []);
-  */
+  }, [groupId]);
 
   useEffect(() => {
-    // Set theme based on system preference
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setTheme(matchMedia.matches ? "dark" : "light");
 
@@ -65,24 +54,26 @@ const MemberChurnRateChart = () => {
   return (
     <ChartContainer className={theme}>
       <ResponsiveContainer width="100%" height="90%">
-        <RechartsLineChart
-          data={data}
-          //margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
-        >
+        <RechartsLineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" />
           <XAxis
             dataKey="time"
-            label={{ value: "Time (Months)", position: "insideBottomRight", offset: -5,style: { fill: "white",fontSize: "12px" } }}
+            label={{
+              value: "Date",
+              position: "insideBottomRight",
+              offset: -5,
+              style: { fill: "white", fontSize: "12px" },
+            }}
             tick={{ fill: "var(--axis-color)", fontSize: "0.8em" }}
           />
           <YAxis
             label={{
-              value: "Member Retention",
+              value: "Retained Members",
               angle: -90,
               position: "insideLeft",
               offset: 15,
-              dy:60,
-              style: { fill: "white",fontSize: "12px" },
+              dy: 60,
+              style: { fill: "white", fontSize: "12px" },
             }}
             tick={{ fill: "var(--axis-color)", fontSize: "0.8em" }}
           />
@@ -111,7 +102,6 @@ const MemberChurnRateChart = () => {
   );
 };
 
-// Styled components for LineChart
 const ChartContainer = styled.div`
   width: 100%;
   height: 100%;
