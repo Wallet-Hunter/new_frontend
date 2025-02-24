@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -11,85 +11,92 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-const MessagePerformanceChart = ({
-  labels = [], // Labels representing messages
-  repliesData = [], // Data representing count of replies
-  reactionsData = [], // Data representing count of reactions
-  isDashboard = false,
-  backgroundColorReplies = "rgba(75, 192, 192, 1)",
-  backgroundColorReactions = "rgba(84, 213, 217, 1)",
-}) => {
+const MessagePerformanceChart = ({ groupId }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [chartData, setChartData] = useState({
-    labels: [],
-    datasets: [],
-  });
-
-  // Fetch data from Backend
-  const fetchData = async () => {
-    try {
-      const response = await fetch("https://b653-27-6-209-17.ngrok-free.app/graphs/messages/messagePerformance?{group_id}", {
-        method: "GET",
-        //credentials: "include", // Include credentials (cookies, etc.)
-      });
-
-      // Parse the JSON response
-      const result = await response.json();
-      setChartData({
-        labels: result.labels,
-        datasets: [
-          {
-            label: "Replies",
-            data: result.repliesData,
-            backgroundColor: isDarkMode ? backgroundColorReplies : backgroundColorReplies,
-            borderColor: isDarkMode ? backgroundColorReplies : backgroundColorReplies,
-            borderWidth: 1,
-          },
-          {
-            label: "Reactions",
-            data: result.reactionsData,
-            backgroundColor: isDarkMode ? backgroundColorReactions : backgroundColorReactions,
-            borderColor: isDarkMode ? backgroundColorReactions : backgroundColorReactions,
-            borderWidth: 1,
-          },
-        ],
-      });
-      console.log("Data successfully fetched from the backend:");
-      console.log(result); // Log the result for debugging
-    } catch (error) {
-      console.error("Error fetching data:", error.message);
-    }
-  };
+  const [chartData, setChartData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setIsDarkMode(matchMedia.matches);
+
     const handleChange = (e) => setIsDarkMode(e.matches);
     matchMedia.addEventListener("change", handleChange);
 
-    fetchData();
-
-    return () => {
-      matchMedia.removeEventListener("change", handleChange);
-    };
+    return () => matchMedia.removeEventListener("change", handleChange);
   }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_SERVER_URL}/graphs/messages/messagePerformance?group_id=${groupId}`
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        console.log("Fetched Data:", result);
+
+        if (!Array.isArray(result) || result.length === 0) {
+          throw new Error("No data available.");
+        }
+
+        setChartData(result);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [groupId]);
+
+  const formattedChartData = useMemo(() => {
+    if (!chartData) return null;
+
+    return {
+      labels: chartData.map((item) => `Msg ${item.message_id}`),
+      datasets: [
+        {
+          label: "Replies",
+          data: chartData.map((item) => item.total_replies),
+          backgroundColor: "rgba(75, 192, 192, 0.8)",
+          borderColor: "rgba(75, 192, 192, 1)",
+          borderWidth: 1,
+        },
+        {
+          label: "Forwards",
+          data: chartData.map((item) => item.total_forwards),
+          backgroundColor: "rgba(255, 159, 64, 0.8)",
+          borderColor: "rgba(255, 159, 64, 1)",
+          borderWidth: 1,
+        },
+      ],
+    };
+  }, [chartData]);
+
+  if (loading) return <p>Loading chart...</p>;
+  if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <div style={{ width: "100%", height: "90%" }} className="chart-container">
         <Bar
-          data={chartData}
+          data={formattedChartData}
           options={{
             responsive: true,
             maintainAspectRatio: false,
             animation: {
               duration: 1000,
               easing: "easeOutQuart",
-            },
-            hover: {
-              animationDuration: 500,
-              mode: "nearest",
-              intersect: true,
             },
             plugins: {
               legend: {
@@ -101,9 +108,8 @@ const MessagePerformanceChart = ({
               },
               tooltip: {
                 callbacks: {
-                  label: (tooltipItem) => {
-                    return `${tooltipItem.dataset.label}: ${tooltipItem.raw}`;
-                  },
+                  label: (tooltipItem) =>
+                    `${tooltipItem.dataset.label}: ${tooltipItem.raw}`,
                 },
               },
             },
@@ -111,30 +117,28 @@ const MessagePerformanceChart = ({
               x: {
                 title: {
                   display: true,
-                  text: "Messages", // X-axis label updated to Messages
-                  color: "white",
+                  text: "Messages",
+                  color: isDarkMode ? "white" : "black",
                 },
                 ticks: {
-                  color: "white",
+                  color: isDarkMode ? "white" : "black",
                 },
-                stacked: true, // Enable stacking on X-axis
-                grid: {
-                  display: false,
-                },
+                grid: { display: false },
               },
               y: {
                 title: {
                   display: true,
-                  text: "Count", // Y-axis label updated to Count
-                  color: "white",
+                  text: "Count",
+                  color: isDarkMode ? "white" : "black",
                 },
                 ticks: {
-                  color: "white",
+                  color: isDarkMode ? "white" : "black",
                 },
                 beginAtZero: true,
-                stacked: true, // Enable stacking on Y-axis
                 grid: {
-                  color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
+                  color: isDarkMode
+                    ? "rgba(220, 220, 220, 0.1)"
+                    : "rgba(0, 0, 0, 0.1)",
                 },
               },
             },
@@ -149,12 +153,8 @@ const MessagePerformanceChart = ({
 
       <style jsx>{`
         .chart-container:hover .chartjs-render-monitor {
-          transform: scale(1.05); /* Scale the entire chart on hover */
+          transform: scale(1.05);
           transition: transform 0.3s ease;
-        }
-        .chartjs-render-monitor:hover {
-          transition: transform 0.3s ease;
-          transform: scale(1.05); /* Scale specific bars on hover */
         }
       `}</style>
     </div>

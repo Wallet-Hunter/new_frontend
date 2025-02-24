@@ -12,7 +12,6 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 const EventPopularityChart = ({ groupId }) => {
-  const [theme, setTheme] = useState("light");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [chartData, setChartData] = useState(null);
 
@@ -26,21 +25,32 @@ const EventPopularityChart = ({ groupId }) => {
           }
         );
         const data = await response.json();
-        if (!data.error) {
+
+        if (data.rows && Array.isArray(data.rows)) {
           const processedData = {
-            labels: data.eventNames,
+            labels: data.rows.map((row) => `Event ${row.event_id}`),
             datasets: [
               {
-                label: "Interaction Count",
-                data: data.interactionCounts,
+                label: "Total Views",
+                data: data.rows.map((row) => row.total_views),
                 backgroundColor: isDarkMode ? "rgba(67, 229, 244, 1)" : "rgba(75, 192, 192, 1)",
+              },
+              {
+                label: "Total Replies",
+                data: data.rows.map((row) => row.total_replies),
+                backgroundColor: isDarkMode ? "rgba(255, 99, 132, 1)" : "rgba(255, 159, 64, 1)",
+              },
+              {
+                label: "Total Forwards",
+                data: data.rows.map((row) => row.total_forwards),
+                backgroundColor: isDarkMode ? "rgba(153, 102, 255, 1)" : "rgba(54, 162, 235, 1)",
               },
             ],
           };
           setChartData(processedData);
         }
       } catch (error) {
-        console.error('Error fetching data from BigQuery:', error);
+        console.error('Error fetching data from backend:', error);
       }
     };
 
@@ -74,7 +84,6 @@ const EventPopularityChart = ({ groupId }) => {
           <Bar
             data={chartData}
             options={{
-              indexAxis: 'y',
               responsive: true,
               maintainAspectRatio: false,
               animation: {
@@ -83,7 +92,8 @@ const EventPopularityChart = ({ groupId }) => {
               },
               plugins: {
                 legend: {
-                  display: false,
+                  display: true,
+                  position: "top",
                 },
                 tooltip: {
                   callbacks: {
@@ -97,31 +107,27 @@ const EventPopularityChart = ({ groupId }) => {
                 x: {
                   title: {
                     display: true,
-                    text: "Interaction Count",
-                    color: "white",
+                    text: "Events",
+                    color: isDarkMode ? "white" : "black",
                   },
                   ticks: {
-                    color: "white",
+                    color: isDarkMode ? "white" : "black",
                   },
                   grid: {
-                    color: isDarkMode
-                      ? "rgba(220, 220, 220, 0.1)"
-                      : "rgba(0, 0, 0, 0.1)",
+                    color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
                   },
                 },
                 y: {
                   title: {
                     display: true,
-                    text: "Event Names",
-                    color: "white",
+                    text: "Count",
+                    color: isDarkMode ? "white" : "black",
                   },
                   ticks: {
-                    color: "white",
+                    color: isDarkMode ? "white" : "black",
                   },
                   grid: {
-                    color: isDarkMode
-                      ? "rgba(220, 220, 220, 0.1)"
-                      : "rgba(0, 0, 0, 0.1)",
+                    color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
                   },
                 },
               },

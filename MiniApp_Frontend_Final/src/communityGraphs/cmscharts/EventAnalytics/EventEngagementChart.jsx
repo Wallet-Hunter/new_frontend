@@ -17,20 +17,21 @@ const EventEngagementChart = ({ groupId }) => {
   const [loading, setLoading] = useState(true);
 
   const fetchBigQueryData = async () => {
-    setLoading(true); // Show loading state while fetching new data
+    setLoading(true);
     try {
       const response = await fetch(
         `${process.env.REACT_APP_SERVER_URL}/graphs/event/eventengagementchart?group_id=${groupId}`
       );
       const result = await response.json();
 
-      if (result.error || !result.rows || result.rows.length === 0) {
-        setChartData(null); // Handle empty data case
+      if (!result || !result.rows || result.rows.length === 0) {
+        setChartData(null);
       } else {
-        const eventNames = result.rows.map((row) => row.event_name);
-        const messages = result.rows.map((row) => row.messages);
-        const reactions = result.rows.map((row) => row.reactions);
-        const replies = result.rows.map((row) => row.replies);
+        // Extracting data from API response
+        const eventNames = result.rows.map(row => row.event_name);
+        const messages = result.rows.map(row => row.messages);
+        const reactions = result.rows.map(row => row.reactions);
+        const replies = result.rows.map(row => row.replies);
 
         setChartData({
           labels: eventNames,
@@ -63,35 +64,31 @@ const EventEngagementChart = ({ groupId }) => {
       console.error("Error fetching data:", error);
       setChartData(null);
     }
-    setLoading(false); // Hide loading state after fetching
+    setLoading(false);
   };
 
   useEffect(() => {
-    // Detect dark mode preference
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setIsDarkMode(matchMedia.matches);
 
-    const handleThemeChange = (e) => setIsDarkMode(e.matches);
-    matchMedia.addEventListener("change", handleThemeChange);
-
-    return () => {
-      matchMedia.removeEventListener("change", handleThemeChange);
+    const handleThemeChange = (e) => {
+      setIsDarkMode(e.matches);
+      fetchBigQueryData(); // Refetch data when theme changes
     };
+
+    matchMedia.addEventListener("change", handleThemeChange);
+    
+    return () => matchMedia.removeEventListener("change", handleThemeChange);
   }, []);
 
   useEffect(() => {
     if (groupId) {
       fetchBigQueryData();
     }
-  }, [groupId]); // Fetch data whenever groupId changes
+  }, [groupId]);
 
-  if (loading) {
-    return <div>Loading chart data...</div>;
-  }
-
-  if (!chartData) {
-    return <div>No engagement data available</div>;
-  }
+  if (loading) return <div>Loading chart data...</div>;
+  if (!chartData) return <div>No engagement data available</div>;
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
@@ -106,28 +103,23 @@ const EventEngagementChart = ({ groupId }) => {
               easing: "easeOutQuart",
             },
             plugins: {
-              legend: {
-                display: false,
-              },
+              legend: { display: false },
               tooltip: {
                 callbacks: {
-                  label: (tooltipItem) => `${tooltipItem.dataset.label}: ${tooltipItem.raw}`,
+                  label: (tooltipItem) =>
+                    `${tooltipItem.dataset.label}: ${tooltipItem.raw}`,
                 },
               },
             },
             scales: {
               x: {
                 stacked: true,
-                title: {
-                  display: true,
-                  text: "Events",
-                  color: "white",
-                },
-                ticks: {
-                  color: "white",
-                },
+                title: { display: true, text: "Events", color: "white" },
+                ticks: { color: "white" },
                 grid: {
-                  color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
+                  color: isDarkMode
+                    ? "rgba(220, 220, 220, 0.1)"
+                    : "rgba(0, 0, 0, 0.1)",
                 },
               },
               y: {
@@ -137,12 +129,12 @@ const EventEngagementChart = ({ groupId }) => {
                   text: "Average Engagement",
                   color: "white",
                 },
-                ticks: {
-                  color: "white",
-                },
+                ticks: { color: "white" },
                 beginAtZero: true,
                 grid: {
-                  color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
+                  color: isDarkMode
+                    ? "rgba(220, 220, 220, 0.1)"
+                    : "rgba(0, 0, 0, 0.1)",
                 },
               },
             },

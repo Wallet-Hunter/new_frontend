@@ -20,58 +20,46 @@ const AnonymousEngagementChart = ({
   borderColorLight = "#54d5d9",
   borderColorDark = "#43aaae",
 }) => {
-  
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [chartData, setChartData] = useState(null);
 
-  // Fetch data from backend
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/anonymousengagementtrends?group_id=${groupId}`);
+        const response = await fetch(
+          `${process.env.REACT_APP_SERVER_URL}/graphs/anonymous/anonymousengagementtrends?group_id=${groupId}`
+        );
         const result = await response.json();
-  
-        // Transform the data to match the expected structure
-        const timePeriods = result.map(item => item.date.value);
-        const replies = result.map(item => item.total_replies);
-        const reactions = result.map(item => item.total_views);  // Assuming "views" as reactions
-        const posts = result.map(item => item.total_forwards);  // Assuming "forwards" as posts
-  
-        setChartData({
-          timePeriods,
-          replies,
-          reactions,
-          posts,
-        });
-  
+
+        if (Array.isArray(result)) {
+          const timePeriods = result.map((item) => item.date);
+          const replies = result.map((item) => item.total_replies);
+          const reactions = result.map((item) => item.total_views);
+          const posts = result.map((item) => item.total_forwards);
+
+          setChartData({ timePeriods, replies, reactions, posts });
+        }
       } catch (error) {
         console.error("Error fetching data:", error.message);
       }
     };
-  
+
     fetchData();
   }, [groupId]);
-  
 
   useEffect(() => {
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setIsDarkMode(matchMedia.matches);
-
     const handleChange = (e) => setIsDarkMode(e.matches);
     matchMedia.addEventListener("change", handleChange);
-
-    //fetchData(); // Fetch data when the component mounts
-
-    return () => {
-      matchMedia.removeEventListener("change", handleChange);
-    };
+    return () => matchMedia.removeEventListener("change", handleChange);
   }, []);
 
   if (!chartData) {
     return <div>Loading chart data...</div>;
   }
 
-  const { timePeriods, replies, reactions, posts, eventDates, eventLabels } = chartData;
+  const { timePeriods, replies, reactions, posts } = chartData;
 
   const data = {
     labels: timePeriods,
@@ -114,41 +102,20 @@ const AnonymousEngagementChart = ({
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      tooltip: {
-        mode: "index",
-        intersect: false,
-      },
-      legend: {
-        display: false
-      },
+      tooltip: { mode: "index", intersect: false },
+      legend: { display: false },
     },
     scales: {
       x: {
-        title: {
-          display: true,
-          text: "Time",
-          color: "white"
-        },
-        ticks: {
-          color: "white"
-        },
-        grid: {
-          color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
-        },
+        title: { display: true, text: "Time", color: "white" },
+        ticks: { color: "white" },
+        grid: { color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)" },
       },
       y: {
-        title: {
-          display: true,
-          text: "Engagement Levels",
-          color: "white"
-        },
-        ticks: {
-          color: "white"
-        },
+        title: { display: true, text: "Engagement Levels", color: "white" },
+        ticks: { color: "white" },
         beginAtZero: true,
-        grid: {
-          color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
-        },
+        grid: { color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)" },
       },
     },
   };

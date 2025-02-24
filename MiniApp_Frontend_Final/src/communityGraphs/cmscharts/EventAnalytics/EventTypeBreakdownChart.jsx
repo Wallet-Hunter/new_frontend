@@ -15,22 +15,23 @@ const EventTypeBreakdownChart = ({ title, groupId }) => {
         `${process.env.REACT_APP_SERVER_URL}/graphs/event/eventtypebreakdownchart?group_id=${groupId}`
       );
       const result = await response.json();
-
+  
       if (!result || !result.rows || !Array.isArray(result.rows) || result.rows.length === 0) {
         console.warn("No event data received.");
         setEventData({ labels: ["No Data"], values: [0] }); // Fallback to prevent crashes
         return;
       }
-
+  
       const labels = result.rows.map((row) => row.event_type || "Unknown");
       const values = result.rows.map((row) => row.participation_count || 0);
-
+  
       setEventData({ labels, values });
     } catch (error) {
       console.error("Error fetching data from API:", error);
       setEventData({ labels: ["Error"], values: [0] });
     }
   };
+  
 
   const totalValue = eventData.values.reduce((acc, value) => acc + value, 0) || 0;
 

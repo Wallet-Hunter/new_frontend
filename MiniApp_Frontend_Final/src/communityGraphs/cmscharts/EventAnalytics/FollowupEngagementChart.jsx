@@ -10,41 +10,11 @@ import {
 } from 'recharts';
 import styled from 'styled-components';
 
-const FollowupEngagementChart = () => {
+const FollowupEngagementChart = ({ groupId }) => {
   const [theme, setTheme] = useState("light");
-
-  // Example hardcoded data for post-event days and engagement count
-  const hardcodedData = [
-    { day: '1', engagement: 4.5 },
-    { day: '2', engagement: 6.2 },
-    { day: '3', engagement: 3.0 },
-    { day: '4', engagement: 5.1 },
-    { day: '5', engagement: 4.8 },
-    { day: '6', engagement: 7.0 },
-    { day: '7', engagement: 8.0 },
-    { day: '8', engagement: 7.5 },
-    { day: '9', engagement: 6.8 },
-    { day: '10', engagement: 5.2 },
-    { day: '11', engagement: 6.0 },
-    { day: '12', engagement: 5.7 },
-    { day: '13', engagement: 6.3 },
-    { day: '14', engagement: 6.5 },
-    { day: '15', engagement: 7.3 },
-    { day: '16', engagement: 6.7 },
-    { day: '17', engagement: 8.1 },
-    { day: '18', engagement: 8.3 },
-    { day: '19', engagement: 9.0 },
-    { day: '20', engagement: 7.2 },
-    { day: '21', engagement: 6.8 },
-    { day: '22', engagement: 7.5 },
-    { day: '23', engagement: 8.4 },
-    { day: '24', engagement: 7.9 },
-  ];
-
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    // Set theme based on system preference
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setTheme(matchMedia.matches ? "dark" : "light");
 
@@ -54,25 +24,22 @@ const FollowupEngagementChart = () => {
 
     matchMedia.addEventListener("change", handleThemeChange);
 
-    // Fetch data logic (commented out for now)
     const fetchData = async () => {
       try {
-        // Replace with actual BigQuery API call logic
         const response = await fetch(
-          '${process.env.REACT_APP_SERVER_URL}/graphs/event/followupengagementchart?group_id=${group_id}',
-          {
-            method: "GET",
-            //credentials: "include", // Include credentials
-          }
+          `${process.env.REACT_APP_SERVER_URL}/graphs/event/followupengagementchart?group_id=${groupId}`
         );
         const result = await response.json();
-        const formattedData = result.map(item => ({
-          day: item.day, // Adjust keys based on your BigQuery schema
-          engagement: parseFloat(item.engagement)
-        }));
-        setData(formattedData.length ? formattedData : []);
+        
+        if (result.rows) {
+          const formattedData = result.rows.map((item, index) => ({
+            day: (index + 1).toString(), // Assuming each item represents a consecutive day
+            engagement: item.total_replies + item.total_forwards
+          }));
+          setData(formattedData);
+        }
       } catch (error) {
-        console.error("Error fetching data from BigQuery:", error);
+        console.error("Error fetching data from API:", error);
       }
     };
 
@@ -81,13 +48,13 @@ const FollowupEngagementChart = () => {
     return () => {
       matchMedia.removeEventListener("change", handleThemeChange);
     };
-  }, []);
+  }, [groupId]);
 
   return (
     <ChartContainer className={theme}>
       <ResponsiveContainer width="100%" height="90%">
         <RechartsLineChart
-          data={data.length ? data : hardcodedData} // Use fetched data or fallback to hardcoded data
+          data={data}
           margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" />
@@ -98,7 +65,7 @@ const FollowupEngagementChart = () => {
             padding={{ left: 10, right: 10 }}
           />
           <YAxis
-            label={{ value: 'Engagement Count (queries, discussions, shares)', angle: -90, position: 'insideCenterLeft', style: { fill: "white", fontSize: "12px" }, offset: 10 }}
+            label={{ value: 'Engagement Count', angle: -90, position: 'insideCenterLeft', style: { fill: "white", fontSize: "12px" }, offset: 10 }}
             tick={{ fill: "var(--axis-color)", fontSize: '0.8em' }}
           />
           <Tooltip
@@ -126,7 +93,6 @@ const FollowupEngagementChart = () => {
   );
 };
 
-// Styled components for LineChart
 const ChartContainer = styled.div`
   width: 100%;
   height: 100%;

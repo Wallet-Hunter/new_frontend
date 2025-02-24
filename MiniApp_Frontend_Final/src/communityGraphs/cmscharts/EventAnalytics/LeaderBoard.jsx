@@ -46,7 +46,7 @@ const LeadershipChart = ({ groupId }) => {
           `${process.env.REACT_APP_SERVER_URL}/graphs/event/leaderboard?group_id=${groupId}`
         );
         const data = await response.json();
-        if (!data.error) {
+        if (Array.isArray(data)) {
           setLeaderboardData(data);
         }
       } catch (error) {
@@ -57,15 +57,8 @@ const LeadershipChart = ({ groupId }) => {
     fetchLeaderboardData();
   }, [groupId]);
 
-  // Process data to match the expected format
-  const formattedData = leaderboardData.map((user) => ({
-    orgId: user.userId,
-    orgName: user.userName,
-    interactionCount: user.engagementScore,
-  }));
-
-  const topOrganizations = formattedData
-    .sort((a, b) => b.interactionCount - a.interactionCount)
+  const topUsers = leaderboardData
+    .sort((a, b) => b.engagementScore - a.engagementScore)
     .slice(0, 5);
 
   const getRowStyle = (index) => {
@@ -120,16 +113,16 @@ const LeadershipChart = ({ groupId }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {topOrganizations.map((user, index) => (
-              <StyledTableRow key={user.orgId} sx={{ ...getRowStyle(index) }}>
+            {topUsers.map((user, index) => (
+              <StyledTableRow key={user.userId} sx={{ ...getRowStyle(index) }}>
                 <StyledTableCell>
                   {index + 1}
                   {index === 0 && <Badge style={{ backgroundColor: "#76dde1" }}>🏆</Badge>}
                   {index === 1 && <Badge style={{ backgroundColor: "#54d5d9" }}>🥈</Badge>}
                   {index === 2 && <Badge style={{ backgroundColor: "#43aaae" }}>🥉</Badge>}
                 </StyledTableCell>
-                <StyledTableCell>{user.orgName}</StyledTableCell>
-                <StyledTableCell align="right">{user.interactionCount}</StyledTableCell>
+                <StyledTableCell>{user.userName}</StyledTableCell>
+                <StyledTableCell align="right">{user.engagementScore}</StyledTableCell>
               </StyledTableRow>
             ))}
           </TableBody>

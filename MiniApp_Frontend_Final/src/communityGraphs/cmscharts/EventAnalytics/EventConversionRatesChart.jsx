@@ -10,27 +10,11 @@ import {
 } from 'recharts';
 import styled from 'styled-components';
 
-const EventConversionChart = () => {
+const EventConversionChart = ({ groupId }) => {
   const [theme, setTheme] = useState("light");
-  const [data, setData] = useState([]); // State to store fetched data
-
-  // Hardcoded data for testing (with date and conversion count)
-  const hardcodedData = [
-    { date: "2024-01-01", conversionCount: 80 },
-    { date: "2024-02-01", conversionCount: 85 },
-    { date: "2024-03-01", conversionCount: 90 },
-    { date: "2024-04-01", conversionCount: 92 },
-    { date: "2024-05-01", conversionCount: 95 },
-    { date: "2024-06-01", conversionCount: 120 },
-    { date: "2024-07-01", conversionCount: 130 },
-    { date: "2024-08-01", conversionCount: 140 },
-    { date: "2024-09-01", conversionCount: 145 },
-    { date: "2024-10-01", conversionCount: 150 },
-    { date: "2024-11-01", conversionCount: 155 },
-  ];
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    // Set theme based on system preference
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setTheme(matchMedia.matches ? "dark" : "light");
 
@@ -40,26 +24,25 @@ const EventConversionChart = () => {
 
     matchMedia.addEventListener("change", handleThemeChange);
 
-    // Fetch data from BigQuery (commented out for now)
     const fetchData = async () => {
       try {
         const response = await fetch(
-          '${process.env.REACT_APP_SERVER_URL}/graphs/event/eventconversionchart?group_id=${group_id}',
-          {
-            method: "GET",
-            //credentials: "include", // Include credentials
-          }
+          `${process.env.REACT_APP_SERVER_URL}/graphs/event/eventconversionchart?group_id=${groupId}`
         );
-
         const result = await response.json();
-        const transformedData = result.map((row) => ({
-          date: row.date,
-          conversionCount: row.conversionCount,
-        }));
-        setData(transformedData.length ? transformedData : []);
+
+        if (result.rows) {
+          const transformedData = result.rows.map((row) => ({
+            date: row.date,
+            conversionCount: row.total_conversion_count,
+          }));
+          setData(transformedData);
+        } else {
+          setData([]);
+        }
       } catch (error) {
         console.error("Error fetching data from BigQuery:", error);
-        setData([]); // Fallback to hardcoded data on error
+        setData([]);
       }
     };
 
@@ -68,7 +51,7 @@ const EventConversionChart = () => {
     return () => {
       matchMedia.removeEventListener("change", handleThemeChange);
     };
-  }, []);
+  }, [groupId]);
 
   return (
     <ChartContainer className={theme}>
@@ -122,7 +105,6 @@ const EventConversionChart = () => {
   );
 };
 
-// Styled components for LineChart
 const ChartContainer = styled.div`
   width: 100%;
   height: 100%;

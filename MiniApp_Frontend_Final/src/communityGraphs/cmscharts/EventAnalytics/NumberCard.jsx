@@ -5,8 +5,8 @@ const NumberCard = ({ title, number }) => {
   return (
     <Card
       sx={{
-        minWidth: '100%',  // Ensures the card stretches fully within its container
-        maxWidth: 300,     // Limits the max width
+        minWidth: '100%',
+        maxWidth: 300,
         padding: 2,
         backgroundColor: 'transparent',
         color: 'green.500',
@@ -22,14 +22,14 @@ const NumberCard = ({ title, number }) => {
         <Typography
           variant="h6"
           component="div"
-          sx={{ fontSize: { xs: '1rem', sm: '1.2rem' }, color: "white", fontWeight: 'bold' }} // Responsive font size
+          sx={{ fontSize: { xs: '1rem', sm: '1.2rem' }, color: "white", fontWeight: 'bold' }}
         >
           {title}
         </Typography>
         <Typography
           variant="h4"
           component="div"
-          sx={{ fontWeight: 'bold', color: "white", fontSize: { xs: '2rem', sm: '3rem' } }} // Responsive font size
+          sx={{ fontWeight: 'bold', color: "white", fontSize: { xs: '2rem', sm: '3rem' } }}
         >
           {number}
         </Typography>
@@ -54,8 +54,7 @@ const TotalEventsCard = ({ groupId }) => {
 
         const data = await response.json();
 
-        // Ensure data is fetched correctly and is a number
-        if (typeof data.data === 'number') {
+        if (data && typeof data.data === 'number') {
           setTotalEvents(data.data);
         } else {
           console.error('Unexpected API response format:', data);
@@ -63,7 +62,7 @@ const TotalEventsCard = ({ groupId }) => {
         }
       } catch (error) {
         console.error('Error fetching data from API:', error);
-        setTotalEvents(0); // Handle network or other errors
+        setTotalEvents(0);
       }
     };
 
@@ -72,7 +71,7 @@ const TotalEventsCard = ({ groupId }) => {
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-      <NumberCard  number={totalEvents} />
+      <NumberCard title="Total Events" number={totalEvents} />
     </Box>
   );
 };

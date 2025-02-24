@@ -10,7 +10,7 @@ import {
 } from "recharts";
 import styled from "styled-components";
 
-const AnonymousFeedbackChart = ({groupId}) => {
+const AnonymousFeedbackChart = ({ groupId }) => {
   const [theme, setTheme] = useState("light");
   const [data, setData] = useState([]);
 
@@ -37,18 +37,18 @@ const AnonymousFeedbackChart = ({groupId}) => {
             },
           }
         );
-    
+
         if (response.ok) {
           const result = await response.json();
-    
-          // Format the data, ensuring that we handle empty daily_feedback_count
+
+          // Format the data to match recharts format
           const formattedData = result.map((item) => ({
-            date: item.date, // Keep the date
-            feedbackCount: item.daily_feedback_count.length > 0 ? item.daily_feedback_count[0] : 0, // Handle empty array
+            date: item.date, // Keep the date as it is
+            feedbackCount: item.daily_feedback_count, // Use the given feedback count directly
           }));
-    
+
           setData(formattedData);
-          console.log("Data successfully fetched from the backend:", result);
+          console.log("Data successfully fetched from the backend:", formattedData);
         } else {
           console.error("Error fetching data:", response.statusText);
         }
@@ -56,16 +56,13 @@ const AnonymousFeedbackChart = ({groupId}) => {
         console.error("Error fetching data:", error.message);
       }
     };
-    
-    fetchData();
-    
 
     fetchData();
 
     return () => {
       matchMedia.removeEventListener("change", handleThemeChange);
     };
-  }, []);
+  }, [groupId]);
 
   return (
     <ChartContainer className={theme}>
@@ -84,7 +81,7 @@ const AnonymousFeedbackChart = ({groupId}) => {
           />
           <YAxis
             label={{
-              value: "Feedback Count (%)",
+              value: "Feedback Count",
               angle: -90,
               position: "insideLeft",
               offset: 5,

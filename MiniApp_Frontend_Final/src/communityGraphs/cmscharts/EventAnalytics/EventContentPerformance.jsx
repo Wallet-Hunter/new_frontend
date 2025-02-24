@@ -11,89 +11,61 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-const EventContentPerformance = ({groupId}) => {
-  
-  const [theme, setTheme] = useState("light");
+const EventContentPerformance = ({ groupId }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [chartData, setChartData] = useState(null);
 
   useEffect(() => {
-    // Placeholder for fetching data from BigQuery
     const fetchChartData = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_SERVER_URL}/graphs/event/eventcontentperformance?group_id=${groupId}`,
-          {
-            method: "GET",
-            //credentials: "include", // Include credentials
-          }
+          `${process.env.REACT_APP_SERVER_URL}/graphs/event/eventcontentperformance?group_id=${groupId}`
         );
         const data = await response.json();
-        // Process and set data accordingly
-        const processedData = {
-          labels: data.eventIDs, // Event IDs on the X-axis
+        
+        if (!data.rows || data.rows.length === 0) {
+          setChartData(null);
+          return;
+        }
+
+        const eventIDs = data.rows.map(row => `E${row.event_id}`);
+        const videosCount = data.rows.map(row => row.total_videos);
+        const imagesCount = data.rows.map(row => row.total_images);
+        const textCount = data.rows.map(row => row.total_texts);
+
+        setChartData({
+          labels: eventIDs,
           datasets: [
             {
               label: "Videos",
-              data: data.videosCount,
+              data: videosCount,
               backgroundColor: isDarkMode ? "#225557" : "#54d5d9",
             },
             {
               label: "Images",
-              data: data.imagesCount,
+              data: imagesCount,
               backgroundColor: isDarkMode ? "#54d5d9" : "#43aaae",
             },
             {
               label: "Text",
-              data: data.textCount,
+              data: textCount,
               backgroundColor: isDarkMode ? "#43aaae" : "#225557",
             },
           ],
-        };
-        setChartData(processedData.length ? processedData : []);
+        });
       } catch (error) {
-        console.error('Error fetching data from BigQuery:', error);
+        console.error('Error fetching data:', error);
       }
     };
 
-    // Uncomment the next line to fetch data
     fetchChartData();
-
-    // Hardcoded data for testing
-    const eventIDs = ["E1", "E2", "E3"];
-    const videosCount = [50, 70, 90];
-    const imagesCount = [30, 40, 60];
-    const textCount = [20, 30, 40];
-
-    setChartData({
-      labels: eventIDs,
-      datasets: [
-        {
-          label: "Videos",
-          data: videosCount,
-          backgroundColor: isDarkMode ? "#225557" : "#54d5d9",
-        },
-        {
-          label: "Images",
-          data: imagesCount,
-          backgroundColor: isDarkMode ? "#54d5d9" : "#43aaae",
-        },
-        {
-          label: "Text",
-          data: textCount,
-          backgroundColor: isDarkMode ? "#43aaae" : "#225557",
-        },
-      ],
-    });
-  }, [isDarkMode,groupId]);
+  }, [isDarkMode, groupId]);
 
   useEffect(() => {
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setIsDarkMode(matchMedia.matches);
-
     const handleChange = (e) => setIsDarkMode(e.matches);
     matchMedia.addEventListener("change", handleChange);
-
     return () => {
       matchMedia.removeEventListener("change", handleChange);
     };
@@ -139,9 +111,7 @@ const EventContentPerformance = ({groupId}) => {
                   color: "white",
                 },
                 grid: {
-                  color: isDarkMode
-                    ? "rgba(220, 220, 220, 0.1)"
-                    : "rgba(0, 0, 0, 0.1)",
+                  color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
                 },
               },
               y: {
@@ -156,18 +126,14 @@ const EventContentPerformance = ({groupId}) => {
                 },
                 beginAtZero: true,
                 grid: {
-                  color: isDarkMode
-                    ? "rgba(220, 220, 220, 0.1)"
-                    : "rgba(0, 0, 0, 0.1)",
+                  color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)",
                 },
               },
             },
             elements: {
               bar: {
                 borderRadius: 10,
-                hoverBackgroundColor: isDarkMode
-                  ? "#43aaaeCC"
-                  : "#54d5d9CC",
+                hoverBackgroundColor: isDarkMode ? "#43aaaeCC" : "#54d5d9CC",
               },
             },
           }}

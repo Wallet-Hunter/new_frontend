@@ -10,27 +10,11 @@ import {
 } from 'recharts';
 import styled from 'styled-components';
 
-const EventImpactChart = ({groupId}) => {
+const EventImpactChart = ({ groupId }) => {
   const [theme, setTheme] = useState("light");
-  const [data, setData] = useState([]); // State to store fetched data
-
-  // Hardcoded data for testing
-  const hardcodedData = [
-    { time: -5, membership: 80 },  // 5 months before the event
-    { time: -4, membership: 85 },
-    { time: -3, membership: 90 },
-    { time: -2, membership: 92 },
-    { time: -1, membership: 95 },
-    { time: 0, membership: 120 }, // Event happens
-    { time: 1, membership: 130 },
-    { time: 2, membership: 140 },
-    { time: 3, membership: 145 },
-    { time: 4, membership: 150 },
-    { time: 5, membership: 155 },
-  ];
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    // Set theme based on system preference
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setTheme(matchMedia.matches ? "dark" : "light");
 
@@ -40,26 +24,26 @@ const EventImpactChart = ({groupId}) => {
 
     matchMedia.addEventListener("change", handleThemeChange);
 
-    // Fetch data from BigQuery (commented out for now)
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_SERVER_URL}/graphs/event/eventimpactchart?group_id=${groupId}`,
-          {
-            method: "GET",
-            //credentials: "include", // Include credentials
-          }
+          `${process.env.REACT_APP_SERVER_URL}/graphs/event/eventimpactchart?group_id=${groupId}`
         );
 
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
         const result = await response.json();
-        const transformedData = result.map((row) => ({
-          time: row.time,
-          membership: row.membership,
-        }));
-        setData(transformedData.length ? transformedData : []);
+
+        if (Array.isArray(result) && result.length > 0) {
+          setData(result);
+        } else {
+          setData([]);
+        }
       } catch (error) {
-        console.error("Error fetching data from BigQuery:", error);
-        setData([]); // Fallback to hardcoded data on error
+        console.error("Error fetching data:", error);
+        setData([]);
       }
     };
 
@@ -73,18 +57,15 @@ const EventImpactChart = ({groupId}) => {
   return (
     <ChartContainer className={theme}>
       <ResponsiveContainer width="100%" height="90%">
-        <RechartsLineChart
-          data={data}
-          //margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
-        >
+        <RechartsLineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" />
           <XAxis
             dataKey="time"
             label={{
-              value: 'Time ',
+              value: 'Time (months)',
               position: 'insideBottomRight',
               offset: -5,
-              style: { fill: "white" , fontSize: "12px"}
+              style: { fill: "white", fontSize: "12px" },
             }}
             tick={{ fill: "var(--axis-color)", fontSize: '0.8em' }}
             padding={{ left: 10, right: 10 }}
@@ -94,8 +75,8 @@ const EventImpactChart = ({groupId}) => {
               value: 'Membership Count',
               angle: -90,
               position: 'insideLeft',
-              style: { fill: "white" , fontSize: "12px"},
-              dy:60,
+              style: { fill: "white", fontSize: "12px" },
+              dy: 60,
               offset: 10,
             }}
             tick={{ fill: "var(--axis-color)", fontSize: '0.8em' }}
@@ -110,14 +91,16 @@ const EventImpactChart = ({groupId}) => {
             }}
             wrapperStyle={{ zIndex: 10 }}
           />
-          <Line
-            type="monotone"
-            dataKey="membership"
-            stroke="var(--line-color)"
-            strokeWidth={2}
-            dot={{ r: 4, fill: "var(--line-color)" }}
-            className="animated-line"
-          />
+          {data.length > 0 && (
+            <Line
+              type="monotone"
+              dataKey="membership"
+              stroke="var(--line-color)"
+              strokeWidth={2}
+              dot={{ r: 4, fill: "var(--line-color)" }}
+              className="animated-line"
+            />
+          )}
         </RechartsLineChart>
       </ResponsiveContainer>
       <Style theme={theme} />
@@ -125,7 +108,6 @@ const EventImpactChart = ({groupId}) => {
   );
 };
 
-// Styled components for LineChart
 const ChartContainer = styled.div`
   width: 100%;
   height: 100%;

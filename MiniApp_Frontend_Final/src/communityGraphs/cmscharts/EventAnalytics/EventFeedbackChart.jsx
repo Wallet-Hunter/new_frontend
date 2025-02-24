@@ -11,91 +11,57 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-const EventFeedback = () => {
-  const [theme, setTheme] = useState("light");
+const EventFeedback = ({ groupId }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [chartData, setChartData] = useState(null);
 
   useEffect(() => {
-    // Placeholder for fetching data from BigQuery
     const fetchChartData = async () => {
       try {
         const response = await fetch(
-          '${process.env.REACT_APP_SERVER_URL}/graphs/event/eventfeedback?group_id=1471430787',
-          {
-            method: "GET",
-            //credentials: "include", // Include credentials
-          }
+          `${process.env.REACT_APP_SERVER_URL}/graphs/event/eventfeedback?group_id=${groupId}`
         );
-        const data = await response.json();
-        // Process and set data accordingly
-        const processedData = {
-          labels: data.feedbackKeywords, // Feedback keywords on the X-axis
+        const { rows } = await response.json();
+        
+        const labels = rows.map(row => row.feedback_keywords);
+        const positiveFeedback = rows.map(row => row.positive_feedback);
+        const negativeFeedback = rows.map(row => row.negative_feedback);
+        const neutralFeedback = rows.map(row => row.neutral_feedback);
+        
+        setChartData({
+          labels,
           datasets: [
             {
               label: "Positive Feedback",
-              data: data.positiveFeedback,
+              data: positiveFeedback,
               backgroundColor: isDarkMode ? "#225557" : "#54d5d9",
             },
             {
               label: "Negative Feedback",
-              data: data.negativeFeedback,
+              data: negativeFeedback,
               backgroundColor: isDarkMode ? "#54d5d9" : "#43aaae",
             },
             {
               label: "Neutral Feedback",
-              data: data.neutralFeedback,
+              data: neutralFeedback,
               backgroundColor: isDarkMode ? "#43aaae" : "#225557",
             },
           ],
-        };
-        setChartData(processedData.length ? processedData : []);
+        });
       } catch (error) {
-        console.error('Error fetching data from BigQuery:', error);
+        console.error("Error fetching data from BigQuery:", error);
       }
     };
 
-    // Uncomment the next line to fetch data
     fetchChartData();
-
-    // Hardcoded data for testing (useful for when the fetch logic is commented out)
-    const feedbackKeywords = ["Excellent", "Good", "Average", "Bad", "Poor"];
-    const positiveFeedback = [50, 30, 20, 10, 5];
-    const negativeFeedback = [5, 10, 20, 50, 60];
-    const neutralFeedback = [30, 40, 35, 25, 20];
-
-    setChartData({
-      labels: feedbackKeywords,
-      datasets: [
-        {
-          label: "Positive Feedback",
-          data: positiveFeedback,
-          backgroundColor: isDarkMode ? "#225557" : "#54d5d9",
-        },
-        {
-          label: "Negative Feedback",
-          data: negativeFeedback,
-          backgroundColor: isDarkMode ? "#54d5d9" : "#43aaae",
-        },
-        {
-          label: "Neutral Feedback",
-          data: neutralFeedback,
-          backgroundColor: isDarkMode ? "#43aaae" : "#225557",
-        },
-      ],
-    });
-  }, [isDarkMode]);
+  }, [groupId, isDarkMode]);
 
   useEffect(() => {
     const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
     setIsDarkMode(matchMedia.matches);
-
     const handleChange = (e) => setIsDarkMode(e.matches);
     matchMedia.addEventListener("change", handleChange);
-
-    return () => {
-      matchMedia.removeEventListener("change", handleChange);
-    };
+    return () => matchMedia.removeEventListener("change", handleChange);
   }, []);
 
   if (!chartData) {
@@ -115,9 +81,7 @@ const EventFeedback = () => {
               easing: "easeOutQuart",
             },
             plugins: {
-              legend: {
-                display: false, // Hide the legend
-              },
+              legend: { display: false },
               tooltip: {
                 callbacks: {
                   label: (tooltipItem) => {
@@ -129,44 +93,22 @@ const EventFeedback = () => {
             scales: {
               x: {
                 stacked: true,
-                title: {
-                  display: true,
-                  text: "Feedback Keywords",
-                  color: "white",
-                },
-                ticks: {
-                  color: "white",
-                },
-                grid: {
-                  color: isDarkMode
-                    ? "rgba(220, 220, 220, 0.1)"
-                    : "rgba(0, 0, 0, 0.1)",
-                },
+                title: { display: true, text: "Feedback Keywords", color: "white" },
+                ticks: { color: "white" },
+                grid: { color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)" },
               },
               y: {
                 stacked: true,
-                title: {
-                  display: true,
-                  text: "Count of Feedback",
-                  color: "white",
-                },
-                ticks: {
-                  color: "white",
-                },
+                title: { display: true, text: "Count of Feedback", color: "white" },
+                ticks: { color: "white" },
                 beginAtZero: true,
-                grid: {
-                  color: isDarkMode
-                    ? "rgba(220, 220, 220, 0.1)"
-                    : "rgba(0, 0, 0, 0.1)",
-                },
+                grid: { color: isDarkMode ? "rgba(220, 220, 220, 0.1)" : "rgba(0, 0, 0, 0.1)" },
               },
             },
             elements: {
               bar: {
                 borderRadius: 10,
-                hoverBackgroundColor: isDarkMode
-                  ? "#43aaaeCC"
-                  : "#54d5d9CC",
+                hoverBackgroundColor: isDarkMode ? "#43aaaeCC" : "#54d5d9CC",
               },
             },
           }}
