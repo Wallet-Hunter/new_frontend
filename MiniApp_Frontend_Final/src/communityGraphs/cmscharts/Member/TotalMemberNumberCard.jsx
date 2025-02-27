@@ -6,6 +6,8 @@ const TotalMemberNumberCard = ({ groupId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  groupId = 2422715291;
+
   useEffect(() => {
     const fetchData = async () => {
       try {

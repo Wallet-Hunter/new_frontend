@@ -53,7 +53,7 @@ const MemberAnalyticsGraph = ({ groupId }) => {
       <Box sx={{ width: { xs: "100%", lg: "40%" } }}>
         <Card
           sx={{
-            height: "12%",
+            height: "30%",
             transition: "box-shadow 0.3s ease-in-out",
             "&:hover": { boxShadow: `0px 4px 20px 0px #54d5d9` },
             backgroundColor: "#171717",

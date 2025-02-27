@@ -29,6 +29,9 @@ const ReactionsAnalysisChart = ({ groupId }) => {
     ],
   });
 
+  groupId = 4732003031;
+
+
   // Fetch data logic
   const fetchData = async () => {
     try {
