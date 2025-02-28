@@ -65,7 +65,7 @@ const SummaryPage = ({ group_name }) => {
 
         /* Style for the summary box */
         .summary-box {
-          background-color: #333;
+          background-color: linear-gradient(to right, #ff7e5f, #feb47b); 
           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
           padding: 10px;
           width: 80%;

@@ -937,7 +937,7 @@ const MemberAnalyticsGraph = ({ groupId }) => {
         </Card> */}
 
         {/*Repetitive Content Posting*/}
-        {/* <Card
+         <Card
           sx={{
             padding: 2,
             backgroundColor: "#171717",
@@ -975,7 +975,7 @@ const MemberAnalyticsGraph = ({ groupId }) => {
               <RepetitiveContentChart groupId={groupId} />
             </Box>
           </CardContent>
-        </Card> */}
+        </Card> 
 
         {/*Behavioral Anomalies*/}
         <Card

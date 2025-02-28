@@ -181,7 +181,7 @@ const BubbleChart = ({ group_id }) => {
     
     bubble
       .append("text")
-      .attr("dy", "1.2em") // Adjust spacing slightly
+      .attr("dy", "2em") // Adjust spacing slightly
       .attr("text-anchor", "middle")
       .text((d) => `${d.data.value || 0}%`.toUpperCase())
       .style("fill", (d) => d.data.color)
