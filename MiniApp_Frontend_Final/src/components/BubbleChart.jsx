@@ -17,58 +17,55 @@ const BubbleChart = ({ group_id }) => {
   const [bubbleData, setBubbleData] = useState([]);
   const containerRef = useRef(null);
 
-  // Hardcoded data for testing
-  const hardcodedData = [
-    
-  ];
+  // Hardcoded data for fallback
+  const hardcodedData = [];
 
-  // Dynamic data fetching logic
+  
+
   const fetchData = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_URL}/homebubblechart?group_id=${group_id}`,
-        {
-          method: "GET",
-          // headers: {
-          //   "ngrok-skip-browser-warning": "true"
-          // }
-        }
+        `${process.env.REACT_APP_SERVER_URL}/homebubblechart?group_id=${group_id}`
       );
 
-      // Check if the response is OK (status 200-299)
       if (!response.ok) {
-        setBubbleData(
-          hardcodedData.map((d) => ({
-            ...d,
-            color: getRandomColor(),
-          }))
-        );
-      } else {
-        // Parse the JSON response
-        const result = await response.json();
-        // Process result to match bubble chart format
-        const formattedData = result.map((d) => ({
+        throw new Error("Failed to fetch data");
+      }
+
+      const result = await response.json();
+
+      // Check if the data is empty or contains only null/0 values
+      if (
+        !Array.isArray(result) ||
+        result.length === 0 ||
+        result.every((d) => !d.value || d.value === 0)
+      ) {
+        console.warn("No valid data received. Displaying 'No data to display'.");
+        setBubbleData([]); // Set empty array to trigger the no-data message
+        return;
+      }
+
+      // Process valid data
+      const formattedData = result
+        .filter((d) => d.name) // Ensure the name exists
+        .map((d) => ({
           name: d.name,
-          value: d.value,
+          value: d.value || 0, // Display 0 if value is null or missing
           color: getRandomColor(),
         }));
 
-        setBubbleData(formattedData);
-        console.log("Data successfully fetched from the backend:");
-      }
+      setBubbleData(formattedData);
     } catch (error) {
       console.error("Error fetching data:", error.message);
+      setBubbleData([]); // Set empty array to show "No data to display"
     }
   };
 
   useEffect(() => {
-    // Fetch dynamic data
     fetchData();
   }, [group_id]);
 
   useEffect(() => {
-    if (bubbleData.length === 0) return;
-
     const svg = d3
       .select(svgRef.current)
       .attr("viewBox", "0 0 100 100")
@@ -78,10 +75,24 @@ const BubbleChart = ({ group_id }) => {
       .style("font", "6px sans-serif")
       .style("background-color", "transparent");
 
-    // **Clear previous chart elements**
-    svg.selectAll("*").remove();
+    svg.selectAll("*").remove(); // Clear previous elements
 
-    const pack = d3.pack().size([100, 100]).padding(0.5);
+    if (bubbleData.length === 0) {
+      // Display "No data to display" message
+      svg
+        .append("text")
+        .attr("x", "50%")
+        .attr("y", "50%")
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "middle")
+        .style("fill", "gray")
+        .style("font-size", "10px")
+        .style("font-weight", "bold")
+        .text("No data to display");
+      return;
+    }
+
+    const pack = d3.pack().size([100, 100]).padding(2.5); // Increased padding
 
     const root = d3.hierarchy({ children: bubbleData }).sum((d) => d.value);
     const nodes = pack(root).leaves();
@@ -162,23 +173,22 @@ const BubbleChart = ({ group_id }) => {
       .append("text")
       .attr("dy", "0.3em")
       .attr("text-anchor", "middle")
-      .text((d) => d.data.name.toUpperCase()) // Convert to uppercase
+      .text((d) => d.data.name.toUpperCase())
       .style("fill", (d) => d.data.color)
-      .style("font-weight", "bold") 
-      .attr("font-size", (d) => `${Math.min(d.r / 4, 10)}px`)
+      .style("font-weight", "bold")
+      .attr("font-size", (d) => `${Math.min(d.r / 6, 8)}px`) // Reduced font size
       .attr("pointer-events", "all");
     
     bubble
       .append("text")
-      .attr("dy", "1.5em")
+      .attr("dy", "1.2em") // Adjust spacing slightly
       .attr("text-anchor", "middle")
-      .text((d) => `${d.data.value}%`.toUpperCase()) // Convert percentage text to uppercase
+      .text((d) => `${d.data.value || 0}%`.toUpperCase())
       .style("fill", (d) => d.data.color)
       .style("fill-opacity", 0.7)
-      .attr("font-size", (d) => `${Math.min(d.r / 4, 8)}px`)
+      .attr("font-size", (d) => `${Math.min(d.r / 6, 6)}px`) // Reduced font size
       .attr("pointer-events", "none");
     
-
     return () => {
       tooltip.remove();
     };

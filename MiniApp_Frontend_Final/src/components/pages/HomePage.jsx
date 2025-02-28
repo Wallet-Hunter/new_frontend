@@ -293,12 +293,12 @@ const HomePage = ({ userName, userScore, userLevel }) => {
           </motion.div>
 
           {/* World Map Section */}
-          <div style={styles.section}>
+          {/* <div style={styles.section}>
             <h3 className="section-title">Languages </h3>
             <div style={{ width: "100%", height: "500px" }}>
               <WorldMap group_id={activeGroup} style={{ width: "100%", height: "100%" }} />
             </div>
-          </div>
+          </div> */}
         </div>
     </Box>
   );
