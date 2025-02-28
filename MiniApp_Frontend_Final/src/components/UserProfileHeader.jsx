@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Confetti from "react-confetti";
- import level from "../assets/level.gif";
+import level from "../assets/level.gif";
 import pts from "../assets/points.gif";
 
 const UserProfileHeader = () => {
@@ -30,8 +30,7 @@ const UserProfileHeader = () => {
 
   return (
     <div className="user-profile-header">
-      {showConfetti && <Confetti numberOfPieces={1000} />
-    }
+      {showConfetti && <Confetti numberOfPieces={1000} />}
       {/* Avatar Section */}
       <div className="avatar-container">
         <img
@@ -67,26 +66,28 @@ const UserProfileHeader = () => {
       </div>
       {/* Embedded CSS */}
       <style>
-@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Press+Start+2P&display=swap');
-</style>
+        @import
+        url('https://fonts.googleapis.com/css2?family=Audiowide&family=Press+Start+2P&display=swap');
+      </style>
       <style>
         {`
           .user-profile-header {
-            display: flex;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Move slightly left */
+  padding: 1rem;
+  background-color: transparent;
+  color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 400px;
+  margin-left: -20px; /* Move slightly left */
+  gap: 1rem;
+  overflow: hidden;
+  box-sizing: border-box;
+}
 
-            align-items: center;
-            padding: 1rem;
-            background-color: transparent;
-            color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-            gap: 1rem;
-            overflow: hidden;
-            box-sizing: border-box;
-          }
 
           .avatar-container {
             display: flex;
